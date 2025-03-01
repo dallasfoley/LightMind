@@ -2,14 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Overview } from "@/components/dashboard/overview";
 import { RecentSales } from "@/components/dashboard/recent-sales";
 import NavLinks from "@/components/dashboard/nav-links";
+import { getUser } from "@/server/actions/getUser";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await getUser();
+
   return (
     <div className="space-y-4">
-      <h2 className="text-3xl font-bold tracking-tight">Welcome Back!</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <NavLinks />
-      </div>
+      {user && <NavLinks user={user} />}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>

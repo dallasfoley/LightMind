@@ -62,6 +62,233 @@ body {
   }
 }
 
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  /* Custom scrollbar styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #e5e7eb;
+    border-radius: 20px;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #374151;
+  }
+}
+
+.bulb-container {
+  width: 100%; /* Take up the full width of the container */
+  height: 100%; /* Take up the full height of the container */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Center within the container */
+  transform-origin: top;
+  animation: swing 3s ease-in-out infinite;
+}
+
+.wire {
+  width: 2px; /* Reduced wire width */
+  height: 75px; /* Reduced wire height */
+  background: black;
+  position: relative;
+  z-index: 1;
+}
+
+.connector {
+  background: #292929;
+  width: 15px; /* Reduced connector width */
+  aspect-ratio: 4/5;
+  border-radius: 1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  z-index: 2;
+}
+
+.grove {
+  background: #424242;
+  width: 17px; /* Reduced grove width */
+  height: 2px; /* Reduced grove height */
+  z-index: 3;
+}
+
+.bulb {
+  margin-top: -1px; /* Adjusted margin */
+  width: 46px; /* Reduced bulb width */
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffeb00;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0px 0px 75px 37px rgba(245, 223, 77, 1); /* Reduced box-shadow */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: -1px;
+  z-index: 1;
+  animation: flash 10s linear infinite;
+}
+
+.metal-wire {
+  position: relative;
+  border: 1px solid black;
+  width: 11px; /* Reduced metal-wire width */
+  height: 5px; /* Reduced metal-wire height */
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.metal-wire:nth-child(1) {
+  top: -1px;
+}
+
+.metal-wire:nth-child(2) {
+  top: -3px;
+}
+
+.metal-wire:nth-child(3) {
+  top: -6px;
+}
+
+@keyframes swing {
+  0% {
+    transform: rotate(15deg);
+  }
+  50% {
+    transform: rotate(-15deg);
+  }
+  100% {
+    transform: rotate(15deg);
+  }
+}
+
+@keyframes flash {
+  /* ... (Keep the flash animation, but adjust the box-shadow and sizing if needed) ... */
+  0% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  1% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 75px 37px rgba(245, 223, 77, 1);
+  }
+  1.001% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  10% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  11.001% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 75px 37px rgba(245, 223, 77, 1);
+  }
+  11.002% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  12% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 75px 37px rgba(245, 223, 77, 1);
+  }
+
+  /*    */
+  39.999% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  40% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  41% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  41.001% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+
+  /*    */
+
+  75% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  75.5% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  75.501% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+
+  /*    */
+
+  80% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  81.001% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  81.002% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  82% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  82.001% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  82.002% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  83% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  83.001% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  83.002% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+  83.003% {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 0px 0px transparent;
+  }
+  88% {
+    background: rgba(255, 235, 0, 1);
+    box-shadow: 0px 0px 150px 75px rgba(245, 223, 77, 1);
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

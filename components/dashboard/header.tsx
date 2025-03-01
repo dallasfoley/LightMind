@@ -9,26 +9,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, User } from "lucide-react";
-import Image from "next/image";
+import { SignOutButton } from "@clerk/nextjs";
+import { Bell, User, Settings } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 
 export default function Header() {
+  const { user, isSignedIn } = useUser();
   return (
-    <header className="flex h-14 lg:h-[60px] justify-between items-center gap-4 border-b px-6">
-      <div className="flex items-center">
-        <h1 className="text-lg font-semibold">LightMind</h1>
-        <Image
-          src={"/brain-logo.png"}
-          alt=""
-          height={36}
-          width={36}
-          className="mx-4"
-        />
-      </div>
+    <header className="flex h-14 lg:h-[60px] justify-end items-center gap-4 border-b px-6">
       <div>
         <Button size="icon" variant="ghost" className="mr-4">
           <Bell className="h-4 w-4" />
           <span className="sr-only">Notifications</span>
+        </Button>
+        <Button size="icon" variant="ghost" className="mr-4">
+          <Settings className="h-12 w-12" />
+          <span className="sr-only">Settings</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -38,11 +34,15 @@ export default function Header() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              {isSignedIn && user?.firstName}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Sign out</DropdownMenuItem>
+            <SignOutButton>
+              <DropdownMenuItem>Sign-Out</DropdownMenuItem>
+            </SignOutButton>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

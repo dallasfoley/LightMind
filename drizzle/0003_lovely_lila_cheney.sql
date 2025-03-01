@@ -1,0 +1,1 @@
+ALTER TABLE "checkIns" ALTER COLUMN "date" SET NOT NULL;

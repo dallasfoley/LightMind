@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -24,28 +23,43 @@ import {
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { checkInSchema, type CheckInFormData } from "@/schema/checkInSchema";
+import {
+  type CheckInFormDataType,
+  CheckInFormSchema,
+} from "@/schema/checkInSchema";
 import { submitCheckIn } from "@/server/actions/submitCheckIn";
 import { Card } from "../ui/card";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
-export function DailyCheckInForm() {
+export function DailyCheckInForm({ userId }: { userId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
-  const form = useForm<CheckInFormData>({
-    resolver: zodResolver(checkInSchema),
+  const form = useForm<CheckInFormDataType>({
+    resolver: zodResolver(CheckInFormSchema),
     defaultValues: {
       date: new Date(),
       mood: 3,
       energy: 3,
-      sleep: 3,
+      sleepHours: 3,
+      sleepQuality: 3,
+      stress: 3,
       notes: "",
     },
   });
 
-  async function onSubmit(data: CheckInFormData) {
+  async function onSubmit(formData: CheckInFormDataType) {
     setIsSubmitting(true);
-    const result = await submitCheckIn(data);
+    const result = await submitCheckIn(formData, userId);
     setIsSubmitting(false);
 
     if (result.success) {
@@ -53,6 +67,7 @@ export function DailyCheckInForm() {
         title: "Check-in submitted",
         description: "Your daily check-in has been recorded.",
       });
+      router.replace("/dashboard");
       form.reset();
     } else {
       toast({
@@ -63,10 +78,15 @@ export function DailyCheckInForm() {
     }
   }
 
+  const handleNotesValue = (value: string | null | undefined) => {
+    return value === null ? "" : value;
+  };
+
   return (
     <Card className="p-4 md:p-8 w-64 md:w-[640px] text-black flex justify-center items-center">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Date field */}
           <FormField
             control={form.control}
             name="date"
@@ -107,12 +127,16 @@ export function DailyCheckInForm() {
               </FormItem>
             )}
           />
+          {/* Mood field */}
           <FormField
             control={form.control}
             name="mood"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mood</FormLabel>
+                <div className="flex justify-between items-center">
+                  <FormLabel>Mood</FormLabel>
+                  <FormLabel>{[field.value]}</FormLabel>
+                </div>
                 <FormControl>
                   <Slider
                     min={1}
@@ -129,12 +153,16 @@ export function DailyCheckInForm() {
               </FormItem>
             )}
           />
+          {/* Energy field */}
           <FormField
             control={form.control}
             name="energy"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Energy Level</FormLabel>
+                <div className="flex justify-between items-center">
+                  <FormLabel>Energy Level</FormLabel>
+                  <FormLabel>{[field.value]}</FormLabel>
+                </div>
                 <FormControl>
                   <Slider
                     min={1}
@@ -151,12 +179,16 @@ export function DailyCheckInForm() {
               </FormItem>
             )}
           />
+          {/* Sleep Quality field */}
           <FormField
             control={form.control}
-            name="sleep"
+            name="sleepQuality"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sleep Quality</FormLabel>
+                <div className="flex justify-between items-center">
+                  <FormLabel>Sleep Quality</FormLabel>
+                  <FormLabel>{[field.value]}</FormLabel>
+                </div>
                 <FormControl>
                   <Slider
                     min={1}
@@ -173,6 +205,64 @@ export function DailyCheckInForm() {
               </FormItem>
             )}
           />
+          {/* Sleep Hours field */}
+          <FormField
+            control={form.control}
+            name="sleepHours"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Hours of Sleep</FormLabel>
+                <Select
+                  onValueChange={(value) =>
+                    field.onChange(Number.parseInt(value, 10))
+                  }
+                  defaultValue={field.value.toString()}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select sleep hours" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Array.from({ length: 25 }, (_, i) => (
+                      <SelectItem key={i} value={i.toString()}>
+                        {i}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>How many hours did you sleep?</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Stress field */}
+          <FormField
+            control={form.control}
+            name="stress"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex justify-between items-center">
+                  <FormLabel>Stress</FormLabel>
+                  <FormLabel>{[field.value]}</FormLabel>
+                </div>
+                <FormControl>
+                  <Slider
+                    min={1}
+                    max={5}
+                    step={1}
+                    defaultValue={[field.value]}
+                    onValueChange={(vals) => field.onChange(vals[0])}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Rate your stress level from 1 (lowest) to 5 (highest)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Notes field */}
           <FormField
             control={form.control}
             name="notes"
@@ -184,6 +274,7 @@ export function DailyCheckInForm() {
                     placeholder="Any additional thoughts or reflections for the day?"
                     className="resize-none"
                     {...field}
+                    value={handleNotesValue(field.value)}
                   />
                 </FormControl>
                 <FormDescription>
@@ -193,7 +284,7 @@ export function DailyCheckInForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting ? "Submitting..." : "Submit Check-in"}
           </Button>
         </form>
