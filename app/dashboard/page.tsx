@@ -1,6 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Overview } from "@/components/dashboard/overview";
-import { RecentSales } from "@/components/dashboard/recent-sales";
 import NavLinks from "@/components/dashboard/nav-links";
 import { getUser } from "@/server/actions/getUser";
 
@@ -15,16 +13,12 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Overview</CardTitle>
           </CardHeader>
-          <CardContent className="pl-2">
-            <Overview />
-          </CardContent>
+          <CardContent className="pl-2"></CardContent>
         </Card>
         <Card className="col-span-3">
           <CardHeader>
             <CardTitle>Recent Sales</CardTitle>
-            <CardContent>
-              <RecentSales />
-            </CardContent>
+            <CardContent></CardContent>
           </CardHeader>
         </Card>
       </div>

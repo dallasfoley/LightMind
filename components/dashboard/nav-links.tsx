@@ -8,6 +8,7 @@ import JournalCard from "./card-content/journal-card";
 import { Suspense } from "react";
 import LightBulbIcon from "./card-content/lightbulb-icon";
 import { FadeLoader } from "react-spinners";
+import CustomizationIcon from "./card-content/customization-icon";
 
 export default function NavLinks({ user }: { user: UserType }) {
   const links = [
@@ -39,6 +40,7 @@ export default function NavLinks({ user }: { user: UserType }) {
       title: "Customization",
       link: "customization",
       color: "bg-pink-100 dark:bg-pink-900",
+      content: <CustomizationIcon />,
     },
     {
       title: "AI Chatbot",
@@ -55,7 +57,7 @@ export default function NavLinks({ user }: { user: UserType }) {
   return (
     <nav className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       {links.map((link, id) => (
-        <Suspense key={id} fallback={<FadeLoader />}>
+        <Suspense key={id} fallback={<FadeLoader color="white" />}>
           <Link href={`/dashboard/${link.link}`}>
             <Card
               className={`${link.color} aspect-square hover:shadow-md transition-shadow duration-200 ease-in-out p-2`}

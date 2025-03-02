@@ -4,4 +4,5 @@ export type ResourceType = {
   text?: string;
   onlineChat?: string;
   TTY?: string;
+  description?: string;
 };

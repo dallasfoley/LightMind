@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckInDataType } from "@/schema/checkInSchema";
-import { BarChart } from "recharts";
+import { BarChart, ResponsiveContainer } from "recharts";
 import { Bar } from "recharts";
 
 export default function CheckInGraph({ data }: { data: CheckInDataType[] }) {
@@ -12,8 +12,10 @@ export default function CheckInGraph({ data }: { data: CheckInDataType[] }) {
   }
 
   return (
-    <BarChart width={100} height={100} data={data}>
-      <Bar dataKey="mood" fill="#8884d8" />
-    </BarChart>
+    <ResponsiveContainer width="80%" height="80%">
+      <BarChart width={100} height={100} data={data}>
+        <Bar dataKey="mood" fill="#8884d8" />
+      </BarChart>
+    </ResponsiveContainer>
   );
 }

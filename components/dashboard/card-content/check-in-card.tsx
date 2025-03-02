@@ -1,6 +1,6 @@
-import CheckInGraph from "./check-in-graph";
 import { UserType } from "@/schema/userSchema";
 import { getCheckIns } from "@/server/actions/getCheckIns";
+import CheckInGraphWrapper from "./check-in-graph-wrapper";
 
 export default async function CheckInCard({ user }: { user: UserType }) {
   if (!user) {
@@ -9,5 +9,5 @@ export default async function CheckInCard({ user }: { user: UserType }) {
 
   const checkIns = await getCheckIns(user);
 
-  return <>{checkIns.length > 0 && <CheckInGraph data={checkIns} />}</>;
+  return <>{checkIns.length > 0 && <CheckInGraphWrapper data={checkIns} />}</>;
 }

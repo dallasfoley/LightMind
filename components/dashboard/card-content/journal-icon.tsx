@@ -85,14 +85,14 @@ export default function JournalIcon() {
               M100.5,20 L120,20 Q130,75 120,130 L100.5,130 Z;
               M100.5,20 L100.5,20 L100.5,130 L100.5,130 Z;
               M20,20 L100.5,20 L100.5,130 L20,130 Z"
-            keyTimes="0;0.3;0.6;0.8;1"
+            keyTimes="0;0.25;0.5;0.75;1"
           />
           <animate
             attributeName="fill"
             dur="1.5s"
             repeatCount="indefinite"
             values="#c7d2fe;#c7d2fe;#b4bffc;#a5b4fc;#c7d2fe"
-            keyTimes="0;0.3;0.6;0.8;1"
+            keyTimes="0;0.25;0.5;0.75;1"
           />
         </path>
 
@@ -114,7 +114,7 @@ export default function JournalIcon() {
                 M110,45 L120,45;
                 M110,45 L110,45;
                 M30,45 L90,45"
-              keyTimes="0;0.3;0.6;0.8;1"
+              keyTimes="0;0.25;0.5;0.75;1"
             />
           </path>
           <path
@@ -133,7 +133,7 @@ export default function JournalIcon() {
                 M110,70 L120,70;
                 M110,70 L110,70;
                 M30,70 L90,70"
-              keyTimes="0;0.3;0.6;0.8;1"
+              keyTimes="0;0.25;0.5;0.75;1"
             />
           </path>
           <path
@@ -152,7 +152,7 @@ export default function JournalIcon() {
                 M110,95 L120,95;
                 M110,95 L110,95;
                 M30,95 L90,95"
-              keyTimes="0;0.3;0.6;0.8;1"
+              keyTimes="0;0.25;0.5;0.75;1"
             />
           </path>
         </g>
