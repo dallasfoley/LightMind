@@ -14,7 +14,7 @@ export default function CheckInGraph({ data }: { data: CheckInDataType[] }) {
   return (
     <ResponsiveContainer width="80%" height="80%">
       <BarChart width={100} height={100} data={data}>
-        <Bar dataKey="mood" fill="#8884d8" />
+        <Bar dataKey="mood" fill="#8884d8" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

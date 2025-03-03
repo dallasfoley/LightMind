@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
+import ReminderSwitch from "@/components/reminders/reminder-switch";
 
 export default async function RemindersPage() {
   const user = await getUser();
@@ -51,6 +52,7 @@ export default async function RemindersPage() {
                   <TableHead>Due Date</TableHead>
                   <TableHead>Due Time</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -65,8 +67,27 @@ export default async function RemindersPage() {
                       {format(new Date(reminder.datetime), "p")}
                     </TableCell>
                     <TableCell>
-                      {reminder.completed ? "Completed" : "Pending"}
+                      <span
+                        className={`font-medium ${
+                          reminder.completed
+                            ? "text-green-600"
+                            : "text-amber-600"
+                        }`}
+                      >
+                        {reminder.completed ? "Completed" : "Pending"}
+                      </span>
                     </TableCell>
+                    {user && (
+                      <TableCell>
+                        <ReminderSwitch
+                          reminder={{
+                            ...reminder,
+                            completed: reminder.completed ?? false,
+                          }}
+                          userId={user?.id}
+                        />
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

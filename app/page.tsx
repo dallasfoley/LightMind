@@ -63,7 +63,7 @@ export default function HeroPage() {
       <div className="flex flex-col md:flex-row gap-4 items-center my-4 md:my-8">
         <Button
           onClick={() => router.push("/sign-in")}
-          className="md:h-10 bg-white text-black z-10 hover:text-white"
+          className="md:h-10 bg-white text-black z-10 hover:text-white hover:scale-110 transition duration-300"
         >
           <h2 className="md:text-lg flex items-center justify-between">
             Sign-in

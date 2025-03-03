@@ -57,7 +57,14 @@ export default function NavLinks({ user }: { user: UserType }) {
   return (
     <nav className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       {links.map((link, id) => (
-        <Suspense key={id} fallback={<FadeLoader color="white" />}>
+        <Suspense
+          key={id}
+          fallback={
+            <div className="flex items-center justify-center h-full w-full">
+              <FadeLoader color="white" />
+            </div>
+          }
+        >
           <Link href={`/dashboard/${link.link}`}>
             <Card
               className={`${link.color} aspect-square hover:shadow-md transition-shadow duration-200 ease-in-out p-2`}

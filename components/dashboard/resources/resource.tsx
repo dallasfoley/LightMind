@@ -79,6 +79,22 @@ export default function Resource({ resource }: { resource: ResourceType }) {
           </Button>
         </CardFooter>
       )}
+
+      {resource.meeting && (
+        <CardFooter className="pt-2 pb-4">
+          <Button variant="outline" asChild className="w-full gap-2 group">
+            <Link
+              href={resource.meeting}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Globe className="h-4 w-4" />
+              <span>Find a Meeting</span>
+              <ExternalLink className="h-3 w-3 ml-auto transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }

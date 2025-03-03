@@ -7,7 +7,16 @@ export default async function CheckInCard({ user }: { user: UserType }) {
     return <p>User not found. Please log in.</p>;
   }
 
-  const checkIns = await getCheckIns(user);
+  const checkIns = await getCheckIns(user, 7);
 
-  return <>{checkIns.length > 0 && <CheckInGraphWrapper data={checkIns} />}</>;
+  return (
+    <>
+      {checkIns.length > 0 && (
+        <div className="h-full w-full flex flex-col justify-center items-center">
+          <CheckInGraphWrapper data={checkIns} />
+          <h3 className="text-black">Weekly Mood</h3>
+        </div>
+      )}
+    </>
+  );
 }
