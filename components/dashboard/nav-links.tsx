@@ -42,20 +42,10 @@ export default function NavLinks({ user }: { user: UserType }) {
       color: "bg-pink-100 dark:bg-pink-900",
       content: <CustomizationIcon />,
     },
-    {
-      title: "AI Chatbot",
-      link: "chatbot",
-      color: "bg-red-100 dark:bg-red-900",
-      content: (
-        <div className="flex items-center justify-center w-full h-full">
-          <ArrowRight className="w-12 h-12" />
-        </div>
-      ),
-    },
   ];
 
   return (
-    <nav className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+    <nav className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       {links.map((link, id) => (
         <Suspense
           key={id}

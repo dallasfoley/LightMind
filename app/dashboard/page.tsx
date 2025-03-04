@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-4">
       {user && <NavLinks user={user} />}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div>
         <Card className="col-span-4 p-2">
           <CardContent>{user && <Graph user={user} />}</CardContent>
         </Card>

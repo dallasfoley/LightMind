@@ -36,7 +36,7 @@ export default async function JournalCard({ user }: { user: UserType }) {
 
   return (
     <div className="flex flex-col justify-center items-center h-full w-full text-lg font-semibold text-black">
-      <div className="flex-shrink-0 w-24 h-24">
+      <div className="flex-shrink-0 w-24 h-24 scale-125">
         <JournalIcon />
       </div>
       <div className="flex items-center mt-1">

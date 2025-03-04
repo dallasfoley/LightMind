@@ -8,6 +8,7 @@ export async function getReminders(user: UserType, today: boolean = false) {
   try {
     if (today) {
       const todayDate = new Date().toISOString().split("T")[0];
+      console.log(todayDate);
       const reminders = user
         ? await db
             .select()

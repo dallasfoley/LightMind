@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import ReminderSwitch from "@/components/reminders/reminder-switch";
+import DeleteReminderButton from "@/components/reminders/delete-reminder-button";
 
 export default async function RemindersPage() {
   const user = await getUser();
@@ -52,7 +53,8 @@ export default async function RemindersPage() {
                   <TableHead>Due Date</TableHead>
                   <TableHead>Due Time</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead>Completed?</TableHead>
+                  <TableHead>Delete</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -88,6 +90,9 @@ export default async function RemindersPage() {
                         />
                       </TableCell>
                     )}
+                    <TableCell>
+                      <DeleteReminderButton reminderId={reminder.id} />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -3,6 +3,8 @@ import { getReminders } from "@/server/actions/getReminders";
 
 export default async function RemindersCard({ user }: { user: UserType }) {
   const reminders = await getReminders(user, true);
+
+  console.log("reminders: ", reminders);
   if (!reminders)
     return <p className="text-red-500 text-center">Error loading reminders</p>;
 

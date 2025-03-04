@@ -18,8 +18,7 @@ export async function submitReminder(
       return { success: false, error: "Unauthorized" };
     }
 
-    const datetime = new Date(data.datetime);
-    await db.insert(RemindersTable).values({ ...data, datetime, userId });
+    await db.insert(RemindersTable).values({ ...data, userId });
   } catch (e) {
     console.error(e);
     return { success: false, error: "Database error" };

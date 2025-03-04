@@ -46,14 +46,18 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
     defaultValues: {
       title: "",
       description: "",
-      datetime: "",
+      datetime: new Date(),
       completed: false,
     },
   });
 
   const handleSubmit = async (formData: z.infer<typeof ReminderFormSchema>) => {
-    await submitReminder(formData, userId);
-    router.replace("/dashboard/reminders");
+    try {
+      await submitReminder(formData, userId);
+      router.replace("/dashboard/reminders");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Generate time options in 30-minute intervals
@@ -105,6 +109,7 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                       className="h-32 resize-none"
                       placeholder="Enter a description (optional)"
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -130,7 +135,7 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                             }`}
                           >
                             {field.value ? (
-                              format(new Date(field.value), "PPP")
+                              format(field.value, "PPP")
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -141,13 +146,17 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={
-                            field.value ? new Date(field.value) : undefined
-                          }
+                          selected={field.value}
                           onSelect={(date) => {
                             if (date) {
-                              date.setHours(0, 0, 0, 0);
-                              field.onChange(date.toISOString());
+                              const currentTime = field.value || new Date();
+                              date.setHours(
+                                currentTime.getHours(),
+                                currentTime.getMinutes(),
+                                0,
+                                0
+                              );
+                              field.onChange(date);
                             }
                           }}
                           disabled={(date) => {
@@ -176,12 +185,10 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                     <Select
                       onValueChange={(time) => {
                         const [hours, minutes] = time.split(":").map(Number);
-                        const date = field.value
-                          ? new Date(field.value)
-                          : new Date();
+                        const date = field.value || new Date();
                         date.setHours(hours);
                         date.setMinutes(minutes);
-                        field.onChange(date.toISOString());
+                        field.onChange(date);
                       }}
                       value={
                         field.value
