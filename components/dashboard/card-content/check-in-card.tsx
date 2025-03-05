@@ -1,5 +1,5 @@
 import { UserType } from "@/schema/userSchema";
-import { getCheckIns } from "@/server/actions/getCheckIns";
+import { getCheckIns } from "@/server/actions/checkIns/getCheckIns";
 import CheckInGraphWrapper from "./check-in-graph-wrapper";
 
 export default async function CheckInCard({ user }: { user: UserType }) {

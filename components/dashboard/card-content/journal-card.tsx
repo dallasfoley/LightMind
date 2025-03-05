@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import type { UserType } from "@/schema/userSchema";
 import { and, eq, gte } from "drizzle-orm";
 import JournalIcon from "./journal-icon";
+import { resetJournalStreak } from "@/server/actions/users/resetJournalStreak";
 
 export default async function JournalCard({ user }: { user: UserType }) {
   const yesterday = new Date();
@@ -23,6 +24,9 @@ export default async function JournalCard({ user }: { user: UserType }) {
         gte(JournalTable.date, yesterdayString)
       )
     );
+
+  if (activeStreak.length === 0 && user.journalStreak !== 0)
+    await resetJournalStreak(user.id);
 
   const streakResult =
     activeStreak.length > 0

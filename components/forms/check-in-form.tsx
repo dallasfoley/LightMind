@@ -27,7 +27,7 @@ import {
   type CheckInFormDataType,
   CheckInFormSchema,
 } from "@/schema/checkInSchema";
-import { submitCheckIn } from "@/server/actions/submitCheckIn";
+import { submitCheckIn } from "@/server/actions/checkIns/submitCheckIn";
 import { Card } from "../ui/card";
 import {
   Select,

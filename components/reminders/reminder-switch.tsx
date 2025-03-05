@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { ReminderType } from "@/schema/reminderSchema";
 import { Switch } from "@/components/ui/switch";
-import { completeReminder } from "@/server/actions/completeReminder";
+import { completeReminder } from "@/server/actions/reminders/completeReminder";
 import { useState } from "react";
 
 export default function ReminderSwitch({

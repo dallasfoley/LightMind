@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,21 +23,23 @@ import {
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { submitJournalEntry } from "@/server/actions/submitJournalEntry";
-import { JournalEntryFormType } from "@/schema/journalEntrySchema";
+import { submitJournalEntry } from "@/server/actions/journals/submitJournalEntry";
+import {
+  JournalEntryFormSchema,
+  type JournalEntryFormType,
+} from "@/schema/journalEntrySchema";
 import { useRouter } from "next/navigation";
-import { UserType } from "@/schema/userSchema";
-
-const formSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-  date: z.date(),
-  content: z.string().min(1, { message: "Content is required" }),
-});
+import type { UserType } from "@/schema/userSchema";
+import { getJournalDates } from "@/server/actions/journals/getJournalDates";
 
 export function JournalPageForm({ user }: { user: UserType }) {
   const [showAlert, setShowAlert] = useState(false);
+  const [existingDates, setExistingDates] = useState<Date[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(JournalEntryFormSchema),
     defaultValues: {
       title: "",
       date: new Date(),
@@ -46,7 +47,21 @@ export function JournalPageForm({ user }: { user: UserType }) {
     },
   });
 
-  const router = useRouter();
+  useEffect(() => {
+    const fetchDates = async () => {
+      setIsLoading(true);
+      try {
+        const dates = user ? await getJournalDates(user.id) : [];
+        setExistingDates(dates.map((date) => new Date(date.date)));
+      } catch (error) {
+        console.error("Error fetching journal dates:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDates();
+  }, [user]);
 
   const onSubmit = async (formData: JournalEntryFormType) => {
     try {
@@ -61,6 +76,42 @@ export function JournalPageForm({ user }: { user: UserType }) {
     } catch (error) {
       console.error("Error submitting form:", error);
     }
+  };
+
+  const hasExistingEntry = (date: Date) => {
+    return existingDates.some(
+      (existingDate) =>
+        format(existingDate, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+    );
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+
+    if (hasExistingEntry(date)) {
+      // Use the full path instead of a relative path
+      const formattedDate = format(date, "yyyy-MM-dd");
+      console.log(
+        `Navigating to existing entry: /dashboard/journal/${formattedDate}`
+      );
+      router.push(`/dashboard/journal/${formattedDate}`);
+    } else {
+      form.setValue("date", date);
+    }
+  };
+
+  // Create a function to render date cell content
+  const renderDateCell = (day: Date) => {
+    const hasEntry = hasExistingEntry(day);
+    return (
+      <div
+        className={`w-full h-full flex items-center justify-center ${
+          hasEntry ? "bg-primary/20 font-bold rounded-full" : ""
+        }`}
+      >
+        {day.getDate()}
+      </div>
+    );
   };
 
   return (
@@ -120,15 +171,22 @@ export function JournalPageForm({ user }: { user: UserType }) {
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
+                    {isLoading ? (
+                      <div className="p-4 text-center">Loading calendar...</div>
+                    ) : (
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={handleDateSelect}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        components={{
+                          DayContent: ({ date }) => renderDateCell(date),
+                        }}
+                        initialFocus
+                      />
+                    )}
                   </PopoverContent>
                 </Popover>
                 <FormMessage />

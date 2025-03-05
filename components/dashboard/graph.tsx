@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { getCheckIns } from "@/server/actions/getCheckIns";
+import { getCheckIns } from "@/server/actions/checkIns/getCheckIns";
 import { format } from "date-fns";
 import { UserType } from "@/schema/userSchema";
 import { FadeLoader } from "react-spinners";

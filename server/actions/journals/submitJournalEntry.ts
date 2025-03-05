@@ -7,7 +7,7 @@ import {
 import { db } from "@/lib/db";
 import { JournalTable, UserTable } from "@/drizzle/schema";
 import { format } from "date-fns";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { UserType } from "@/schema/userSchema";
 
 export async function submitJournalEntry(
@@ -23,19 +23,28 @@ export async function submitJournalEntry(
 
     if (!user?.id) {
       return { success: false, error: "Unauthorized" };
-    } else {
-      const userId = user.id;
-      const formattedDate = format(data.date, "yyyy-MM-dd");
-      await db
-        .insert(JournalTable)
-        .values({ content: data.content, date: formattedDate, userId });
-
+    }
+    const userId = user.id;
+    const formattedDate = format(data.date, "yyyy-MM-dd");
+    await db
+      .insert(JournalTable)
+      .values({ content: data.content, date: formattedDate, userId });
+    const todaysJournals = await db
+      .select()
+      .from(JournalTable)
+      .where(
+        and(
+          eq(JournalTable.userId, userId),
+          eq(JournalTable.date, formattedDate)
+        )
+      );
+    if (todaysJournals.length === 0) {
       await db
         .update(UserTable)
         .set({ journalStreak: (user.journalStreak || 0) + 1 })
         .where(eq(UserTable.id, user.id));
-      return { success: true };
     }
+    return { success: true };
   } catch (e) {
     console.error(e);
     return { success: false };

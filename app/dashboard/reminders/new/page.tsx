@@ -1,4 +1,4 @@
-import { getUser } from "@/server/actions/getUser";
+import { getUser } from "@/server/actions/users/getUser";
 import ReminderForm from "@/components/forms/reminder-form";
 
 export default async function NewReminderPage() {

@@ -1,5 +1,5 @@
 import { DailyCheckInForm } from "@/components/forms/check-in-form";
-import { getUser } from "@/server/actions/getUser";
+import { getUser } from "@/server/actions/users/getUser";
 
 export default async function CheckInPage() {
   const user = await getUser();

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "../ui/button";
-import { deleteReminder } from "@/server/actions/deleteReminder";
+import { deleteReminder } from "@/server/actions/reminders/deleteReminder";
 
 export default function DeleteReminderButton({
   reminderId,

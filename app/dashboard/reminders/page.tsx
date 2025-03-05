@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { RemindersTable } from "@/drizzle/schema";
 import { db } from "@/lib/db";
-import { getUser } from "@/server/actions/getUser";
+import { getUser } from "@/server/actions/users/getUser";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import NavLinks from "@/components/dashboard/nav-links";
-import { getUser } from "@/server/actions/getUser";
+import { getUser } from "@/server/actions/users/getUser";
 import { RecentSales } from "@/components/dashboard/recent-sales";
 import Graph from "@/components/dashboard/graph";
 
@@ -10,11 +10,11 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-4">
       {user && <NavLinks user={user} />}
-      <div>
-        <Card className="col-span-4 p-2">
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="p-2">
           <CardContent>{user && <Graph user={user} />}</CardContent>
         </Card>
-        <Card className="col-span-3">
+        <Card>
           <CardHeader>
             <CardTitle>Recent Sales</CardTitle>
             <CardContent>

@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReminderFormSchema } from "@/schema/reminderSchema";
-import { submitReminder } from "@/server/actions/submitReminder";
+import { submitReminder } from "@/server/actions/reminders/submitReminder";
 
 interface ReminderFormProps {
   userId: string;

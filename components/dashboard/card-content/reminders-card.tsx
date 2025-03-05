@@ -1,5 +1,5 @@
 import type { UserType } from "@/schema/userSchema";
-import { getReminders } from "@/server/actions/getReminders";
+import { getReminders } from "@/server/actions/reminders/getReminders";
 
 export default async function RemindersCard({ user }: { user: UserType }) {
   const reminders = await getReminders(user, true);
