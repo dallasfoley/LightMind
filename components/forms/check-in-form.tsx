@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
@@ -38,15 +38,51 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { updateCheckIn } from "@/server/actions/checkIns/updateCheckIn";
+import { getTodaysCheckIn } from "@/server/actions/checkIns/getTodaysCheckIn";
 
-export function DailyCheckInForm({ userId }: { userId: string }) {
+export function DailyCheckInForm({
+  userId,
+  update = false,
+}: {
+  userId: string;
+  update: boolean;
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [defaultFormValues, setDefaultFormValues] =
+    useState<CheckInFormDataType | null>(null);
   const { toast } = useToast();
   const router = useRouter();
 
+  useEffect(() => {
+    if (update) {
+      const fetchCheckIn = async () => {
+        const todayCheckIn = await getTodaysCheckIn(userId);
+        if (todayCheckIn) {
+          const checkInData = {
+            ...todayCheckIn,
+            date: new Date(todayCheckIn.date),
+          };
+          setDefaultFormValues(checkInData);
+        }
+      };
+      fetchCheckIn();
+    } else {
+      setDefaultFormValues({
+        date: new Date(),
+        mood: 3,
+        energy: 3,
+        sleepHours: 3,
+        sleepQuality: 3,
+        stress: 3,
+        notes: "",
+      });
+    }
+  }, [update, userId]);
+
   const form = useForm<CheckInFormDataType>({
     resolver: zodResolver(CheckInFormSchema),
-    defaultValues: {
+    defaultValues: defaultFormValues || {
       date: new Date(),
       mood: 3,
       energy: 3,
@@ -55,13 +91,24 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
       stress: 3,
       notes: "",
     },
+    resetOptions: {
+      keepDirtyValues: false,
+      keepIsSubmitted: false,
+      keepTouched: false,
+      keepValues: false,
+    },
   });
+
+  useEffect(() => {
+    if (defaultFormValues) {
+      form.reset(defaultFormValues);
+    }
+  }, [defaultFormValues, form]);
 
   async function onSubmit(formData: CheckInFormDataType) {
     setIsSubmitting(true);
 
     try {
-      // Ensure the date is a proper Date object
       const submissionData = {
         ...formData,
         date:
@@ -70,7 +117,9 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
             : new Date(formData.date),
       };
 
-      const result = await submitCheckIn(submissionData, userId);
+      const result = update
+        ? await updateCheckIn(submissionData, userId)
+        : await submitCheckIn(submissionData, userId);
 
       if (result.success) {
         toast({
@@ -152,9 +201,7 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                           console.log("Selected date:", newDate);
                         }
                       }}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
+                      disabled={(date) => date !== new Date()}
                       initialFocus
                     />
                   </PopoverContent>
@@ -175,6 +222,7 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                 </div>
                 <FormControl>
                   <Slider
+                    key={field.value}
                     min={1}
                     max={5}
                     step={1}
@@ -201,6 +249,7 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                 </div>
                 <FormControl>
                   <Slider
+                    key={field.value}
                     min={1}
                     max={5}
                     step={1}
@@ -227,6 +276,7 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                 </div>
                 <FormControl>
                   <Slider
+                    key={field.value}
                     min={1}
                     max={5}
                     step={1}
@@ -252,7 +302,9 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                   onValueChange={(value) =>
                     field.onChange(Number.parseInt(value, 10))
                   }
-                  defaultValue={field.value.toString()}
+                  defaultValue={
+                    field.value !== undefined ? field.value.toString() : ""
+                  } // Ensure defaultValue is updated
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -262,7 +314,7 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                   <SelectContent>
                     {Array.from({ length: 25 }, (_, i) => (
                       <SelectItem key={i} value={i.toString()}>
-                        {i}
+                        {i.toString()}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -284,6 +336,7 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                 </div>
                 <FormControl>
                   <Slider
+                    key={field.value}
                     min={1}
                     max={5}
                     step={1}
@@ -320,7 +373,11 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isSubmitting} className="w-full">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
             {isSubmitting ? "Submitting..." : "Submit Check-in"}
           </Button>
         </form>

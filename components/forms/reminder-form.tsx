@@ -222,7 +222,10 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
               Create Reminder
             </Button>
           </form>

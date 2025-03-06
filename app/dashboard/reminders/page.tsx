@@ -19,19 +19,25 @@ import DeleteReminderButton from "@/components/reminders/delete-reminder-button"
 
 export default async function RemindersPage() {
   const user = await getUser();
-  const reminders = user
+  const unSortedReminders = user
     ? await db
         .select()
         .from(RemindersTable)
         .where(eq(RemindersTable.userId, user?.id))
     : [];
 
+  const reminders = unSortedReminders.sort((a, b) => {
+    if (a.completed && !b.completed) return 1;
+    if (!a.completed && b.completed) return -1;
+    return a.datetime.getTime() - b.datetime.getTime();
+  });
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-4xl font-bold">Reminders</h1>
         <Button
-          className="transform transition-transform duration-300 bg-white text-black hover:scale-105 hover:bg-white"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           asChild
         >
           <Link href="/dashboard/reminders/new">Create New Reminder</Link>

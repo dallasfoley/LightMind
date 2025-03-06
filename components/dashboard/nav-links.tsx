@@ -9,12 +9,24 @@ import { Suspense } from "react";
 import LightBulbIcon from "./card-content/lightbulb-icon";
 import { FadeLoader } from "react-spinners";
 import CustomizationIcon from "./card-content/customization-icon";
+import { db } from "@/lib/db";
+import { CheckInTable } from "@/drizzle/schema";
+import { and, eq } from "drizzle-orm";
+import { format } from "date-fns";
 
-export default function NavLinks({ user }: { user: UserType }) {
+export default async function NavLinks({ user }: { user: UserType }) {
+  const today = format(new Date(), "yyyy-MM-dd");
+  const checkIn = await db
+    .select()
+    .from(CheckInTable)
+    .where(and(eq(CheckInTable.date, today), eq(CheckInTable.userId, user.id)));
+
+  const checkedInToday = checkIn.length > 0 ? true : false;
+
   const links = [
     {
       title: "Check-In",
-      link: "check-in",
+      link: !checkedInToday ? "check-in" : "check-in/update",
       color: "bg-blue-100 dark:bg-blue-900",
       content: <CheckInCard user={user} />,
     },

@@ -11,26 +11,41 @@ import { BsJournals } from "react-icons/bs";
 import { FaBell } from "react-icons/fa";
 import { BiCustomize } from "react-icons/bi";
 import { FaFolder } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { UserType } from "@/schema/userSchema";
+import { getTodaysCheckIn } from "@/server/actions/checkIns/getTodaysCheckIn";
+import { CheckInDataType } from "@/schema/checkInSchema";
 
-const sidebarItems = [
-  {
-    title: "Daily check in",
-    href: "/dashboard/check-in",
-    icon: <RiStarSmileFill />,
-  },
-  { title: "Journal", href: "/dashboard/journal", icon: <BsJournals /> },
-  { title: "Reminders", href: "/dashboard/reminders", icon: <FaBell /> },
-
-  { title: " Resources", href: "/dashboard/resources", icon: <FaFolder /> },
-  {
-    title: "Customization",
-    href: "/dashboard/customization",
-    icon: <BiCustomize />,
-  },
-];
-
-export default function Sidebar() {
+export default function Sidebar({ user }: { user: UserType }) {
   const pathname = usePathname();
+  const [checkIn, setCheckIn] = useState<CheckInDataType>();
+
+  useEffect(() => {
+    const fetchCheckIn = async () => {
+      const todayCheckIn = await getTodaysCheckIn(user.id);
+      if (todayCheckIn) {
+        setCheckIn({ ...todayCheckIn, date: new Date(todayCheckIn.date) });
+      }
+    };
+    fetchCheckIn();
+  }, [user.id]);
+
+  const sidebarItems = [
+    {
+      title: "Daily check in",
+      href: checkIn ? "/dashboard/check-in/update" : "/dashboard/check-in",
+      icon: <RiStarSmileFill />,
+    },
+    { title: "Journal", href: "/dashboard/journal", icon: <BsJournals /> },
+    { title: "Reminders", href: "/dashboard/reminders", icon: <FaBell /> },
+
+    { title: " Resources", href: "/dashboard/resources", icon: <FaFolder /> },
+    {
+      title: "Customization",
+      href: "/dashboard/customization",
+      icon: <BiCustomize />,
+    },
+  ];
 
   return (
     <div className="hidden md:w-[300px] bg-slate-800 text-white lg:block dark:bg-gray-800/40">

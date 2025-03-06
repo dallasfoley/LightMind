@@ -18,8 +18,6 @@ export const getUser = cache(async (): Promise<UserType | null> => {
         .where(eq(UserTable.clerkUserId, userId))
         .limit(1);
 
-      console.log("users: ", users);
-
       if (users.length > 0) {
         const user = users[0];
         return {
