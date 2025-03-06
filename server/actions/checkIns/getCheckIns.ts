@@ -9,7 +9,9 @@ import { UserType } from "@/schema/userSchema";
 export async function getCheckIns(user: UserType, limit: number | null = null) {
   let checkIns: CheckInDataType[] = [];
 
-  if (user) {
+  if (!user) return checkIns;
+
+  try {
     if (limit) {
       checkIns = (
         await db
@@ -28,7 +30,12 @@ export async function getCheckIns(user: UserType, limit: number | null = null) {
           .orderBy(CheckInTable.date)
       ).map((checkIn) => ({ ...checkIn, date: new Date(checkIn.date) }));
     }
+  } catch (error) {
+    console.error("Error fetching check-ins:", error);
   }
 
-  return checkIns;
+  return checkIns.map((checkIn) => ({
+    ...checkIn,
+    date: `${checkIn.date}T12:00:00.000Z`,
+  }));
 }

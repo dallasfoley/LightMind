@@ -24,11 +24,16 @@ export async function submitJournalEntry(
     if (!user?.id) {
       return { success: false, error: "Unauthorized" };
     }
+
     const userId = user.id;
     const formattedDate = format(data.date, "yyyy-MM-dd");
-    await db
-      .insert(JournalTable)
-      .values({ content: data.content, date: formattedDate, userId });
+    await db.insert(JournalTable).values({
+      title: data.title,
+      content: data.content,
+      date: formattedDate,
+      userId,
+    });
+
     const todaysJournals = await db
       .select()
       .from(JournalTable)
@@ -38,7 +43,8 @@ export async function submitJournalEntry(
           eq(JournalTable.date, formattedDate)
         )
       );
-    if (todaysJournals.length === 0) {
+
+    if (todaysJournals.length === 1) {
       await db
         .update(UserTable)
         .set({ journalStreak: (user.journalStreak || 0) + 1 })
@@ -47,6 +53,6 @@ export async function submitJournalEntry(
     return { success: true };
   } catch (e) {
     console.error(e);
-    return { success: false };
+    return { success: false, error: String(e) };
   }
 }

@@ -59,22 +59,44 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
 
   async function onSubmit(formData: CheckInFormDataType) {
     setIsSubmitting(true);
-    const result = await submitCheckIn(formData, userId);
-    setIsSubmitting(false);
 
-    if (result.success) {
-      toast({
-        title: "Check-in submitted",
-        description: "Your daily check-in has been recorded.",
-      });
-      router.replace("/dashboard");
-      form.reset();
-    } else {
+    try {
+      // Ensure the date is a proper Date object
+      const submissionData = {
+        ...formData,
+        date:
+          formData.date instanceof Date
+            ? formData.date
+            : new Date(formData.date),
+      };
+
+      const result = await submitCheckIn(submissionData, userId);
+
+      if (result.success) {
+        toast({
+          title: "Check-in submitted",
+          description: "Your daily check-in has been recorded.",
+        });
+        router.replace("/dashboard");
+        form.reset();
+      } else {
+        toast({
+          title: "Error",
+          description:
+            String(result.error) ||
+            "There was a problem submitting your check-in.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting check-in:", error);
       toast({
         title: "Error",
-        description: "There was a problem submitting your check-in.",
+        description: "An unexpected error occurred.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -115,7 +137,21 @@ export function DailyCheckInForm({ userId }: { userId: string }) {
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(date) => {
+                        if (date) {
+                          // Store the date in local timezone without time component
+                          // This ensures the date displayed to the user is the same as what's stored
+                          const year = date.getFullYear();
+                          const month = date.getMonth();
+                          const day = date.getDate();
+
+                          // Create a new date with just the date components (no time)
+                          const newDate = new Date(year, month, day, 12, 0, 0);
+                          field.onChange(newDate);
+
+                          console.log("Selected date:", newDate);
+                        }
+                      }}
                       disabled={(date) =>
                         date > new Date() || date < new Date("1900-01-01")
                       }

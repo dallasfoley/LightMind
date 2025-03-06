@@ -40,7 +40,7 @@ export default async function PreviousEntryPage({
   }
 
   const entry = entries[0];
-  const entryDate = new Date(entry.date);
+  const entryDate = new Date(`${entry.date}T12:00:00.000Z`);
 
   return (
     <div className="container mx-auto px-4 py-8 text-black">

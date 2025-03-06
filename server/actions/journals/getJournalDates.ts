@@ -11,7 +11,14 @@ export async function getJournalDates(userId: string) {
       .select({ date: JournalTable.date })
       .from(JournalTable)
       .where(eq(JournalTable.userId, userId));
-    return dates;
+    return dates.map((entry) => {
+      const dateStr = entry.date;
+      if (typeof dateStr === "string") {
+        // Add time component to avoid timezone shifts
+        return { date: `${dateStr}T12:00:00.000Z` };
+      }
+      return entry;
+    });
   } catch (e) {
     console.error(e);
     return [];

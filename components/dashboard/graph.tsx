@@ -1,34 +1,37 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import {
   CartesianGrid,
   Line,
   LineChart,
   ResponsiveContainer,
   Tooltip,
+  type TooltipProps,
   XAxis,
   YAxis,
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCheckIns } from "@/server/actions/checkIns/getCheckIns";
-import { format } from "date-fns";
+import type {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 import { UserType } from "@/schema/userSchema";
-import { FadeLoader } from "react-spinners";
 
 type FieldType = "mood" | "energy" | "sleepQuality" | "sleepHours" | "stress";
 
 // Define the type for our formatted chart data
 type ChartData = {
   displayDate: string; // Formatted date string for display
-  rawDate: Date; // Original date for sorting
+  originalDate: string; // Original date string for debugging
   mood: number;
   energy: number;
   sleepQuality: number;
   sleepHours: number;
   stress: number;
-  id: string; // Keep the ID for potential future use
+  id: string;
 };
 
 const fieldLabels: Record<FieldType, string> = {
@@ -47,33 +50,101 @@ const fieldColors: Record<FieldType, string> = {
   stress: "#ef4444",
 };
 
+// Helper function to format date for display
+function formatDateForDisplay(dateStr: string): string {
+  // Extract the date parts directly from the string
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const [month, day] = match;
+    // Convert month number to month name
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const monthIndex = Number.parseInt(month, 10) - 1;
+    const monthName = monthNames[monthIndex];
+    // Return formatted date
+    return `${monthName} ${Number.parseInt(day, 10)}`;
+  }
+  // If we can't parse it, return the first 10 chars or the original string
+  return dateStr.substring(0, 10) || dateStr;
+}
+
+// Custom tooltip component to ensure the date is displayed
+const CustomTooltip = ({
+  active,
+  payload,
+}: TooltipProps<ValueType, NameType>) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload as ChartData;
+    return (
+      <div className="custom-tooltip text-black bg-white border border-gray-200 rounded-md p-2 shadow-sm text-sm">
+        <p className="font-medium">Date: {data.displayDate}</p>
+        <p>
+          {fieldLabels[payload[0].dataKey as FieldType]}: {payload[0].value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function FieldSelectorGraph({ user }: { user: UserType }) {
   const [selectedField, setSelectedField] = useState<FieldType>("mood");
   const [data, setData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       try {
         const checkInData = await getCheckIns(user);
+        console.log("Raw check-in data:", checkInData);
 
-        const sortedData = [...checkInData].sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
+        // Sort data by date
+        const sortedData = [...checkInData].sort((a, b) => {
+          // Safely convert to string if it's not already
+          const dateA = typeof a.date === "string" ? a.date : String(a.date);
+          const dateB = typeof b.date === "string" ? b.date : String(b.date);
+          return dateA.localeCompare(dateB);
+        });
 
-        const formattedData: ChartData[] = sortedData.map((item) => ({
-          displayDate: format(new Date(item.date), "MMM d"),
-          rawDate: new Date(item.date),
-          id: item.id,
-          mood: item.mood,
-          energy: item.energy,
-          sleepQuality: item.sleepQuality,
-          sleepHours: item.sleepHours,
-          stress: item.stress,
-        }));
+        // Transform data for the chart
+        const formattedData: ChartData[] = sortedData.map((item) => {
+          // Get the date string
+          const dateStr =
+            typeof item.date === "string" ? item.date : String(item.date);
+
+          // Format the display date without creating a Date object
+          const displayDate = formatDateForDisplay(dateStr);
+
+          return {
+            displayDate,
+            originalDate: dateStr, // Keep original for debugging
+            id: item.id,
+            mood: item.mood,
+            energy: item.energy,
+            sleepQuality: item.sleepQuality,
+            sleepHours: item.sleepHours,
+            stress: item.stress,
+          };
+        });
 
         setData(formattedData);
       } catch (error) {
         console.error("Error fetching check-in data:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -89,9 +160,9 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
   // Get min and max values for Y axis
   const getYDomain = () => {
     if (selectedField === "sleepHours") {
-      return [0, 24];
+      return [0, 12];
     }
-    return [0, 6];
+    return [0, 5];
   };
 
   return (
@@ -112,70 +183,61 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
       </Tabs>
 
       <Card className="p-2">
-        <CardContent className="pt-4 pr-6 h-[300px]">
-          {data.length === 0 ? (
+        <CardContent className="p-4 h-[300px]">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <p>Loading data...</p>
+            </div>
+          ) : data.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <p>No check-in data available. Start tracking your well-being!</p>
             </div>
           ) : (
-            <Suspense
-              fallback={
-                <div className="flex justify-center items-center h-full w-full">
-                  <FadeLoader />
-                </div>
-              }
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={data}
-                  margin={{
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 20,
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={data}
+                margin={{
+                  top: 15,
+                  right: 20,
+                  bottom: 15,
+                  left: 45,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="displayDate"
+                  tick={{ fontSize: 12 }}
+                  height={40}
+                />
+                <YAxis
+                  domain={getYDomain()}
+                  tick={{ fontSize: 12 }}
+                  width={45}
+                  label={{
+                    value: fieldLabels[selectedField],
+                    angle: -90,
+                    position: "insideLeft",
+                    style: {
+                      textAnchor: "middle",
+                      fontSize: "14px",
+                      fill: "#666666",
+                      fontWeight: 500,
+                    },
+                    offset: -35,
                   }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="displayDate"
-                    tick={{ fontSize: 12 }}
-                    height={40}
-                  />
-                  <YAxis
-                    domain={getYDomain()}
-                    tick={{ fontSize: 12 }}
-                    width={45}
-                    label={{
-                      value: fieldLabels[selectedField],
-                      angle: -90,
-                      position: "insideLeft",
-                      style: {
-                        textAnchor: "middle",
-                        fontSize: "18px",
-                        fill: "#666666",
-                      },
-                      offset: 0,
-                    }}
-                  />
-                  <Tooltip
-                    formatter={(value) => [
-                      `${value}`,
-                      fieldLabels[selectedField],
-                    ]}
-                    labelFormatter={(label) => `Date: ${label}`}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey={selectedField}
-                    stroke={fieldColors[selectedField]}
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                    name={fieldLabels[selectedField]}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </Suspense>
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type="monotone"
+                  dataKey={selectedField}
+                  stroke={fieldColors[selectedField]}
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                  name={fieldLabels[selectedField]}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           )}
         </CardContent>
       </Card>

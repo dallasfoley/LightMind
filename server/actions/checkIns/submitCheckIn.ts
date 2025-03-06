@@ -6,7 +6,6 @@ import {
 } from "@/schema/checkInSchema";
 import { db } from "@/lib/db";
 import { CheckInTable } from "@/drizzle/schema";
-import { format } from "date-fns";
 
 export async function submitCheckIn(
   formData: CheckInFormDataType,
@@ -22,7 +21,11 @@ export async function submitCheckIn(
       return { success: false, error: "Unauthorized" };
     }
 
-    const formattedDate = format(data.date, "yyyy-MM-dd");
+    const dateObj = new Date(data.date);
+    const year = dateObj.getUTCFullYear();
+    const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getUTCDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
     await db
       .insert(CheckInTable)
       .values({ ...data, date: formattedDate, userId });
