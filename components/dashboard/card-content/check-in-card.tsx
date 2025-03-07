@@ -7,7 +7,7 @@ export default async function CheckInCard({ user }: { user: UserType }) {
     return <p>User not found. Please log in.</p>;
   }
 
-  const checkIns = await getCheckIns(user, 7);
+  const checkIns = await getCheckIns(user, 7, true);
 
   return (
     <>

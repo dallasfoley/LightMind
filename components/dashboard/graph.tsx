@@ -18,7 +18,7 @@ import type {
   NameType,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
-import { UserType } from "@/schema/userSchema";
+import type { UserType } from "@/schema/userSchema";
 
 type FieldType = "mood" | "energy" | "sleepQuality" | "sleepHours" | "stress";
 
@@ -26,6 +26,7 @@ type FieldType = "mood" | "energy" | "sleepQuality" | "sleepHours" | "stress";
 type ChartData = {
   displayDate: string; // Formatted date string for display
   originalDate: string; // Original date string for debugging
+  sortDate: string; // Date string for sorting
   mood: number;
   energy: number;
   sleepQuality: number;
@@ -51,33 +52,30 @@ const fieldColors: Record<FieldType, string> = {
 };
 
 // Helper function to format date for display
-function formatDateForDisplay(dateStr: string): string {
-  // Extract the date parts directly from the string
-  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (match) {
-    const [month, day] = match;
-    // Convert month number to month name
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const monthIndex = Number.parseInt(month, 10) - 1;
-    const monthName = monthNames[monthIndex];
-    // Return formatted date
-    return `${monthName} ${Number.parseInt(day, 10)}`;
-  }
-  // If we can't parse it, return the first 10 chars or the original string
-  return dateStr.substring(0, 10) || dateStr;
+function formatDateForDisplay(dateObj: Date): string {
+  // Get month and day
+  const month = dateObj.getMonth(); // 0-11
+  const day = dateObj.getDate(); // 1-31
+
+  // Convert month number to month name
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const monthName = monthNames[month];
+
+  // Return formatted date
+  return `${monthName} ${day}`;
 }
 
 // Custom tooltip component to ensure the date is displayed
@@ -111,26 +109,25 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
         const checkInData = await getCheckIns(user);
         console.log("Raw check-in data:", checkInData);
 
-        // Sort data by date
-        const sortedData = [...checkInData].sort((a, b) => {
-          // Safely convert to string if it's not already
-          const dateA = typeof a.date === "string" ? a.date : String(a.date);
-          const dateB = typeof b.date === "string" ? b.date : String(b.date);
-          return dateA.localeCompare(dateB);
-        });
-
         // Transform data for the chart
-        const formattedData: ChartData[] = sortedData.map((item) => {
-          // Get the date string
-          const dateStr =
-            typeof item.date === "string" ? item.date : String(item.date);
+        const formattedData: ChartData[] = checkInData.map((item) => {
+          // Ensure date is a Date object
+          const dateObj =
+            item.date instanceof Date ? item.date : new Date(item.date);
 
-          // Format the display date without creating a Date object
-          const displayDate = formatDateForDisplay(dateStr);
+          // Format the date for display
+          const displayDate = formatDateForDisplay(dateObj);
+
+          // Create a sortable date string (YYYY-MM-DD)
+          const sortDate = dateObj.toISOString().split("T")[0];
+
+          // Create the original date string for debugging
+          const originalDate = dateObj.toISOString();
 
           return {
             displayDate,
-            originalDate: dateStr, // Keep original for debugging
+            originalDate,
+            sortDate,
             id: item.id,
             mood: item.mood,
             energy: item.energy,
@@ -140,7 +137,21 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
           };
         });
 
-        setData(formattedData);
+        // Sort data by date
+        const sortedData = [...formattedData].sort((a, b) => {
+          return a.sortDate.localeCompare(b.sortDate);
+        });
+
+        console.log(
+          "Sorted data:",
+          sortedData.map((d) => ({
+            displayDate: d.displayDate,
+            sortDate: d.sortDate,
+            mood: d.mood,
+          }))
+        );
+
+        setData(sortedData);
       } catch (error) {
         console.error("Error fetching check-in data:", error);
       } finally {
