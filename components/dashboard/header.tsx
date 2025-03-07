@@ -12,19 +12,25 @@ import {
 import { SignOutButton } from "@clerk/nextjs";
 import { Bell, User, Settings } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function Header() {
   const { user, isSignedIn } = useUser();
   return (
     <header className="flex h-14 lg:h-[60px] justify-end items-center gap-4 border-b px-6">
       <div>
-        <Button size="icon" variant="ghost" className="mr-4">
-          <Bell className="h-4 w-4" />
-          <span className="sr-only">Notifications</span>
+        <Button size="icon" variant="ghost" className="mr-4" asChild>
+          <Link href="/">
+            <Bell className="h-4 w-4" />
+            <span className="sr-only">Notifications</span>
+          </Link>
         </Button>
-        <Button size="icon" variant="ghost" className="mr-4">
-          <Settings className="h-12 w-12" />
-          <span className="sr-only">Settings</span>
+
+        <Button size="icon" variant="ghost" className="mr-6" asChild>
+          <Link href="/dashboard/settings">
+            <Settings className="h-12 w-12" />
+            <span className="sr-only">Settings</span>
+          </Link>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -38,8 +44,6 @@ export default function Header() {
               {isSignedIn && user?.firstName}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
             <SignOutButton>
               <DropdownMenuItem>Sign-Out</DropdownMenuItem>
             </SignOutButton>

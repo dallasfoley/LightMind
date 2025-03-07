@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
@@ -53,6 +53,12 @@ export function DailyCheckInForm({
     useState<CheckInFormDataType | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+
+  const today = useMemo(() => {
+    const date = new Date();
+    date.setHours(12, 0, 0, 0);
+    return date;
+  }, []);
 
   useEffect(() => {
     if (update) {
@@ -157,11 +163,11 @@ export function DailyCheckInForm({
     <Card className="p-4 md:p-8 w-64 md:w-[640px] text-black flex justify-center items-center">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Date field */}
+          {/* Date field - readonly display */}
           <FormField
             control={form.control}
             name="date"
-            render={({ field }) => (
+            render={() => (
               <FormItem className="flex flex-col">
                 <FormLabel>Date</FormLabel>
                 <Popover>
@@ -169,15 +175,9 @@ export function DailyCheckInForm({
                     <FormControl>
                       <Button
                         variant={"outline"}
-                        className={`w-[240px] pl-3 text-left font-normal ${
-                          !field.value && "text-muted-foreground"
-                        }`}
+                        className="w-[240px] pl-3 text-left font-normal"
                       >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+                        {format(today, "PPP")}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
@@ -185,27 +185,22 @@ export function DailyCheckInForm({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value}
-                      onSelect={(date) => {
-                        if (date) {
-                          // Store the date in local timezone without time component
-                          // This ensures the date displayed to the user is the same as what's stored
-                          const year = date.getFullYear();
-                          const month = date.getMonth();
-                          const day = date.getDate();
-
-                          // Create a new date with just the date components (no time)
-                          const newDate = new Date(year, month, day, 12, 0, 0);
-                          field.onChange(newDate);
-
-                          console.log("Selected date:", newDate);
-                        }
+                      selected={today}
+                      // This is a read-only date display so we don't need an onSelect
+                      onSelect={() => {}}
+                      // This makes sure only today is selectable (though the UI prevents selection)
+                      disabled={(date) => {
+                        const current = new Date();
+                        current.setHours(0, 0, 0, 0);
+                        return date.getTime() !== current.getTime();
                       }}
-                      disabled={(date) => date !== new Date()}
                       initialFocus
                     />
                   </PopoverContent>
                 </Popover>
+                <FormDescription>
+                  Today&apos;s date is automatically selected
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

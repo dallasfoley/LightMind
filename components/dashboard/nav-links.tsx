@@ -49,8 +49,8 @@ export default async function NavLinks({ user }: { user: UserType }) {
       content: <LightBulbIcon />,
     },
     {
-      title: "Customization",
-      link: "customization",
+      title: "Settings",
+      link: "settings",
       color: "bg-pink-100 dark:bg-pink-900",
       content: <CustomizationIcon />,
     },

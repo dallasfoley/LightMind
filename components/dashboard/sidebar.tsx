@@ -41,8 +41,8 @@ export default function Sidebar({ user }: { user: UserType }) {
 
     { title: " Resources", href: "/dashboard/resources", icon: <FaFolder /> },
     {
-      title: "Customization",
-      href: "/dashboard/customization",
+      title: "Settings",
+      href: "/dashboard/settings",
       icon: <BiCustomize />,
     },
   ];

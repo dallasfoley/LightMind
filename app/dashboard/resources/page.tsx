@@ -1,7 +1,5 @@
 import { resources } from "@/lib/constants";
 import Resource from "@/components/dashboard/resources/resource";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function ResourcesPage() {
@@ -62,7 +60,7 @@ export default function ResourcesPage() {
         <div className="flex flex-col items-center md:pr-52">
           <Link
             href="https://qprinstitute.com/pdfs/Forever_Decision.pdf"
-            className="mt-8 underline text-xl md:text-3xl text-slate-400 hover:text-white"
+            className="mt-8 text-center underline text-xl md:text-3xl text-slate-400 hover:text-white"
           >
             The Forever Decision
           </Link>
@@ -75,7 +73,7 @@ export default function ResourcesPage() {
           </p>
           <Link
             href="https://www.samhsa.gov/mental-health"
-            className="mt-8 underline text-xl md:text-3xl text-slate-400 hover:text-white"
+            className="mt-8 text-center underline text-xl md:text-3xl text-slate-400 hover:text-white"
           >
             Substance Abuse and Mental Health Services Administration (SAMHSA)
           </Link>
@@ -88,7 +86,7 @@ export default function ResourcesPage() {
 
           <Link
             href="https://www.verywellmind.com/"
-            className="mt-8 underline text-xl md:text-3xl text-slate-400 hover:text-white"
+            className="mt-8 text-center underline text-xl md:text-3xl text-slate-400 hover:text-white"
           >
             Verywell Mind
           </Link>
@@ -99,7 +97,7 @@ export default function ResourcesPage() {
           </p>
           <Link
             href="https://themighty.com/"
-            className="mt-8 underline text-xl md:text-3xl text-slate-400 hover:text-white"
+            className="mt-8 text-center underline text-xl md:text-3xl text-slate-400 hover:text-white"
           >
             The Mighty
           </Link>
@@ -107,16 +105,6 @@ export default function ResourcesPage() {
             A community based mental health website which gives members support
             through articles and interactive question and answer components.
           </p>
-        </div>
-
-        <div className="mt-12 text-center md:pr-52">
-          <p className="mb-4 text-muted-foreground">
-            Need more resources or information?
-          </p>
-          <Button variant="outline" className="group text-black">
-            View additional support options
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
         </div>
       </main>
     </div>

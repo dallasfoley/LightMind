@@ -3,6 +3,7 @@
 import { CheckInTable } from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { CheckInFormDataType, CheckInFormSchema } from "@/schema/checkInSchema";
+import { and, eq } from "drizzle-orm";
 
 export async function updateCheckIn(
   formData: CheckInFormDataType,
@@ -18,12 +19,29 @@ export async function updateCheckIn(
       return { success: false, error: "Unauthorized" };
     }
 
-    const dateObj = new Date(data.date);
-    const year = dateObj.getUTCFullYear();
-    const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(dateObj.getUTCDate()).padStart(2, "0");
+    // Always use today's date in UTC format regardless of what was passed in
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(now.getUTCDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
-    await db.update(CheckInTable).set({ ...data, date: formattedDate, userId });
+
+    await db
+      .update(CheckInTable)
+      .set({
+        mood: data.mood,
+        energy: data.energy,
+        sleepHours: data.sleepHours,
+        sleepQuality: data.sleepQuality,
+        stress: data.stress,
+        notes: data.notes,
+      })
+      .where(
+        and(
+          eq(CheckInTable.userId, userId),
+          eq(CheckInTable.date, formattedDate)
+        )
+      );
 
     return { success: true };
   } catch (dbError) {
