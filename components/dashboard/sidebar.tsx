@@ -10,6 +10,7 @@ import { RiStarSmileFill } from "react-icons/ri";
 import { BsJournals } from "react-icons/bs";
 import { FaBell } from "react-icons/fa";
 import { BiCustomize } from "react-icons/bi";
+import { IoIosHome } from "react-icons/io";
 import { FaFolder } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { UserType } from "@/schema/userSchema";
@@ -31,6 +32,11 @@ export default function Sidebar({ user }: { user: UserType }) {
   }, [user.id]);
 
   const sidebarItems = [
+    {
+      title: "Home",
+      href: "/dashboard",
+      icon: <IoIosHome />,
+    },
     {
       title: "Daily check in",
       href: checkIn ? "/dashboard/check-in/update" : "/dashboard/check-in",
