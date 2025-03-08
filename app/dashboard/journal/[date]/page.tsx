@@ -19,9 +19,10 @@ export async function generateStaticParams() {
 export default async function PreviousEntryPage({
   params,
 }: {
-  params: { date: string };
+  params: Promise<{ date: string }>;
 }) {
   const user = await getUser();
+  const { date } = await params;
 
   if (!user) {
     return <div>Please log in to view journal entries.</div>;
@@ -30,17 +31,14 @@ export default async function PreviousEntryPage({
   const entries = await db
     .select()
     .from(JournalTable)
-    .where(
-      and(eq(JournalTable.userId, user.id), eq(JournalTable.date, params.date))
-    );
+    .where(and(eq(JournalTable.userId, user.id), eq(JournalTable.date, date)));
 
   // If no entry is found, return 404
   if (entries.length === 0) {
     notFound();
   }
 
-  const entry = entries[0];
-  const entryDate = new Date(`${entry.date}T12:00:00.000Z`);
+  const entryDate = new Date(`${entries[0].date}T12:00:00.000Z`);
 
   return (
     <div className="container mx-auto px-4 py-8 text-black">
@@ -53,21 +51,24 @@ export default async function PreviousEntryPage({
         </Button>
       </div>
 
-      <h1 className="text-3xl text-white font-bold mb-6">Journal Entry</h1>
-
-      <Card className="max-w-3xl mx-auto p-4">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl">{entry.title}</CardTitle>
-            <div className="text-sm text-muted-foreground">
-              {format(entryDate, "MMMM d, yyyy")}
+      <h1 className="text-3xl text-white font-bold mb-6">Journal Entries</h1>
+      {entries.map((entry, key) => (
+        <Card className="max-w-3xl mb-8 mx-auto p-4" key={key}>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-xl md:text-2xl">
+                {entry.title}
+              </CardTitle>
+              <div className="md:text-lg text-muted-foreground">
+                {format(entryDate, "MMMM d, yyyy")}
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="whitespace-pre-wrap">{entry.content}</div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <div className="whitespace-pre-wrap">{entry.content}</div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

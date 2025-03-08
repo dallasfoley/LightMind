@@ -1,14 +1,16 @@
 "use server";
 import { db } from "@/lib/db";
 import { RemindersTable } from "@/drizzle/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { UserType } from "@/schema/userSchema";
+import { endOfDay, startOfDay } from "date-fns";
 
 export async function getReminders(user: UserType, today: boolean = false) {
   try {
     if (today) {
-      const todayDate = new Date().toISOString().split("T")[0];
-      console.log(todayDate);
+      const today = new Date();
+      const todayStart = startOfDay(today);
+      const todayEnd = endOfDay(today);
       const reminders = user
         ? await db
             .select()
@@ -16,7 +18,9 @@ export async function getReminders(user: UserType, today: boolean = false) {
             .where(
               and(
                 eq(RemindersTable.userId, user.id),
-                sql`DATE(${RemindersTable.datetime}) = ${todayDate}`
+                gte(RemindersTable.datetime, todayStart),
+                lte(RemindersTable.datetime, todayEnd),
+                eq(RemindersTable.completed, false)
               )
             )
         : [];

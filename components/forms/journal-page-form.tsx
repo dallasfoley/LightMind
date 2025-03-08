@@ -221,6 +221,9 @@ export function JournalPageForm({ user }: { user: UserType }) {
                     </PopoverContent>
                   </Popover>
                   <FormMessage className="text-red-500 dark:text-red-400 text-sm mt-1" />
+                  <FormMessage className="text-muted-foreground text-sm mt-1">
+                    Use the date picker to view previous entries
+                  </FormMessage>
                 </FormItem>
               )}
             />
