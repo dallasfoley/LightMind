@@ -44,8 +44,12 @@ export default async function JournalCard({ user }: { user: UserType }) {
         <JournalIcon />
       </div>
       <div className="flex items-center mt-1">
-        <h1 className="text-2xl md:text-3xl m-1 mr-2">{streak}</h1>
-        <span className="text-sm md:text-base text-slate-500">day streak</span>
+        <h1 className="text-2xl md:text-3xl m-1 mr-2 text-zinc-900 dark:text-zinc-200">
+          {streak}
+        </h1>
+        <span className="text-sm md:text-base text-slate-500 dark:text-slate-400">
+          day streak
+        </span>
       </div>
     </div>
   );

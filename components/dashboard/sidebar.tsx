@@ -54,7 +54,7 @@ export default function Sidebar({ user }: { user: UserType }) {
   ];
 
   return (
-    <div className="hidden md:w-[300px] bg-slate-800 text-white lg:block dark:bg-gray-800/40">
+    <div className="hidden md:w-[300px] bg-zinc-300 dark:bg-zinc-800 text-zinc-900 dark:text-white lg:block">
       <div className="flex h-full flex-col gap-2">
         <div className="flex h-[60px] items-center border-b px-6">
           <Link href={"/dashboard"} className="flex items-center">
@@ -78,8 +78,8 @@ export default function Sidebar({ user }: { user: UserType }) {
                 className={cn(
                   "w-full justify-start",
                   pathname === item.href
-                    ? "bg-gray-200 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
-                    : "hover:bg-gray-200 dark:hover:bg-gray-700"
+                    ? "bg-zinc-200 hover:bg-zinc-200 text-zinc-700 dark:text-zinc-200 dark:bg-zinc-700 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
+                    : "text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                 )}
               >
                 <Link href={item.href}>

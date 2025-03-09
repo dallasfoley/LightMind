@@ -18,23 +18,23 @@ export default function Header() {
   const { user, isSignedIn } = useUser();
   return (
     <header className="flex h-14 lg:h-[60px] justify-end items-center gap-4 border-b px-6">
-      <div>
-        <Button size="icon" variant="ghost" className="mr-4" asChild>
-          <Link href="/">
-            <Bell className="h-4 w-4" />
-            <span className="sr-only">Notifications</span>
-          </Link>
-        </Button>
+      <div className="flex items-center">
+        <Link href="/" className="inline-block mr-6">
+          <Bell className="h-5 w-5 text-zinc-900 dark:text-white hover:text-red-500 transition-colors" />
+          <span className="sr-only">Notifications</span>
+        </Link>
 
-        <Button size="icon" variant="ghost" className="mr-6" asChild>
-          <Link href="/dashboard/settings">
-            <Settings className="h-12 w-12" />
-            <span className="sr-only">Settings</span>
-          </Link>
-        </Button>
+        <Link href="/dashboard/settings" className="inline-block mr-6">
+          <Settings className="h-5 w-5 text-zinc-900 dark:text-white hover:text-red-500 transition-colors" />
+          <span className="sr-only">Settings</span>
+        </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="rounded-full">
+            <Button
+              variant="secondary"
+              size="icon"
+              className="rounded-full bg-zinc-900 text-white hover:text-zinc-900 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-950 dark:hover:text-white"
+            >
               <User className="h-5 w-5" />
               <span className="sr-only">Toggle user menu</span>
             </Button>

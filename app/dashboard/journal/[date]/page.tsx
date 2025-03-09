@@ -43,15 +43,17 @@ export default async function PreviousEntryPage({
   return (
     <div className="container mx-auto px-4 py-8 text-black">
       <div className="mb-6">
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/journal" className="flex items-center">
+        <Button variant="outline" className="hover:bg-gray-400" asChild>
+          <Link href="/dashboard/journal" className="flex items-center ">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Journal
           </Link>
         </Button>
       </div>
 
-      <h1 className="text-3xl text-white font-bold mb-6">Journal Entries</h1>
+      <h1 className="text-3xl text-zinc-900 dark:text-white font-bold mb-6">
+        Journal Entries
+      </h1>
       {entries.map((entry, key) => (
         <Card className="max-w-3xl mb-8 mx-auto p-4" key={key}>
           <CardHeader>

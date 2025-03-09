@@ -14,7 +14,7 @@ export default async function CheckInCard({ user }: { user: UserType }) {
       {checkIns.length > 0 && (
         <div className="h-full w-full flex flex-col justify-center items-center">
           <CheckInGraphWrapper data={checkIns} />
-          <h3 className="text-black">Weekly Mood</h3>
+          <h3 className="text-zinc-900 dark:text-zinc-200">Weekly Mood</h3>
         </div>
       )}
     </>

@@ -15,7 +15,7 @@ export default async function JournalPage() {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="mb-10 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-slate-300 dark:text-white">
+            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-zinc-900 dark:text-slate-300">
               My Journal
             </h1>
             <p className="text-slate-500 dark:text-slate-400 italic">
@@ -23,7 +23,7 @@ export default async function JournalPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="p-8 md:p-10">
               {user && (
                 <>
@@ -38,7 +38,11 @@ export default async function JournalPage() {
                         })}
                       </h3>
 
-                      <Button variant="outline" className="text-black" asChild>
+                      <Button
+                        variant="outline"
+                        className="text-black hover:bg-zinc-300"
+                        asChild
+                      >
                         <Link href="/dashboard" className="flex items-center">
                           <ArrowLeft className="mr-2 h-4 w-4" />
                           Back to Dashboard

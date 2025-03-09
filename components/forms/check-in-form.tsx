@@ -160,7 +160,10 @@ export function DailyCheckInForm({
   };
 
   return (
-    <Card className="p-4 md:p-8 w-64 md:w-[640px] text-black flex justify-center items-center">
+    <Card
+      className="p-4 md:p-8 w-64 md:w-[640px] flex justify-center items-center"
+      style={{ backgroundColor: "white", color: "black" }}
+    >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* Date field - readonly display */}

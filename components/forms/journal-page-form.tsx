@@ -155,7 +155,7 @@ export function JournalPageForm({ user }: { user: UserType }) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg font-medium text-slate-700 dark:text-slate-300 block">
+                  <FormLabel className="text-lg font-medium text-zinc-700 block">
                     Title
                   </FormLabel>
                   <FormControl>
@@ -175,7 +175,7 @@ export function JournalPageForm({ user }: { user: UserType }) {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel className="text-lg font-medium text-slate-700 dark:text-slate-300 block">
+                  <FormLabel className="text-lg font-medium text-zinc-700 block">
                     Date
                   </FormLabel>
                   <Popover>
@@ -183,7 +183,7 @@ export function JournalPageForm({ user }: { user: UserType }) {
                       <FormControl>
                         <Button
                           variant={"outline"}
-                          className="w-full border-slate-300 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 p-3 text-left flex items-center justify-between"
+                          className="w-full border-slate-300 dark:border-slate-700 shadow-sm hover:bg-zinc-200 p-3 text-left flex items-center justify-between"
                         >
                           {field.value ? (
                             format(field.value, "MMMM d, yyyy")
@@ -195,7 +195,7 @@ export function JournalPageForm({ user }: { user: UserType }) {
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto p-0 border-slate-200 dark:border-slate-700 shadow-lg"
+                      className="w-auto p-0 border-slate-800 shadow-lg"
                       align="start"
                     >
                       {isLoading ? (
@@ -234,7 +234,7 @@ export function JournalPageForm({ user }: { user: UserType }) {
             name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                <FormLabel className="text-lg font-medium text-zinc-700 mb-2 block">
                   Your Journal Entry
                 </FormLabel>
                 <FormControl>
