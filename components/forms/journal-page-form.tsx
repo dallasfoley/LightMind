@@ -102,13 +102,22 @@ export function JournalPageForm({ user }: { user: UserType }) {
 
   const renderDateCell = (day: Date) => {
     const hasEntry = hasExistingEntry(day);
+    const isToday = new Date().toDateString() === day.toDateString();
+
     return (
       <div
-        className={`w-full h-full flex items-center justify-center rounded-full ${
-          hasEntry
-            ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold"
-            : ""
-        }`}
+        className={`w-full h-full flex items-center justify-center rounded-full 
+          ${
+            hasEntry
+              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold"
+              : ""
+          }
+          ${
+            isToday
+              ? "ring-2 ring-indigo-500 dark:ring-indigo-400 font-bold"
+              : ""
+          }
+        `}
       >
         {day.getDate()}
       </div>
@@ -209,15 +218,19 @@ export function JournalPageForm({ user }: { user: UserType }) {
                           selected={field.value}
                           onSelect={handleDateSelect}
                           disabled={(date) =>
-                            date > new Date() ||
-                            date < new Date("1900-01-01") ||
-                            !hasExistingEntry(date)
+                            date > new Date() || date < new Date("1900-01-01")
                           }
                           components={{
                             DayContent: ({ date }) => renderDateCell(date),
                           }}
                           initialFocus
                           className="rounded-md border-slate-200 dark:border-slate-700 p-3"
+                          classNames={{
+                            day_today:
+                              "bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300",
+                            day_selected:
+                              "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white focus:bg-indigo-600 focus:text-white",
+                          }}
                         />
                       )}
                     </PopoverContent>
