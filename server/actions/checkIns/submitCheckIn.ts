@@ -21,11 +21,20 @@ export async function submitCheckIn(
       return { success: false, error: "Unauthorized" };
     }
 
+    // Fix: Use local date methods instead of UTC to prevent date shifting
     const dateObj = new Date(data.date);
-    const year = dateObj.getUTCFullYear();
-    const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(dateObj.getUTCDate()).padStart(2, "0");
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
+
+    console.log(
+      "Storing check-in with date:",
+      formattedDate,
+      "Original date:",
+      data.date
+    );
+
     await db
       .insert(CheckInTable)
       .values({ ...data, date: formattedDate, userId });

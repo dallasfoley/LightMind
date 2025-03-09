@@ -5,7 +5,7 @@ export default async function CheckInPage() {
   const user = await getUser();
   return (
     <main className="container flex flex-col items-center justify-center mx-auto py-10">
-      <h1 className="text-3xl md:text-5xl font-bold mb-6">
+      <h1 className="text-3xl md:text-5xl font-bold mb-6 text-zinc-900 dark:text-zinc-200">
         Update Today&apos;s Check-In
       </h1>
       {user ? (
