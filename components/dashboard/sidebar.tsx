@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { UserType } from "@/schema/userSchema";
 import { getTodaysCheckIn } from "@/server/actions/checkIns/getTodaysCheckIn";
 import { CheckInDataType } from "@/schema/checkInSchema";
+import { TbMessageChatbot } from "react-icons/tb";
 
 export default function Sidebar({ user }: { user: UserType }) {
   const pathname = usePathname();
@@ -46,6 +47,7 @@ export default function Sidebar({ user }: { user: UserType }) {
     { title: "Reminders", href: "/dashboard/reminders", icon: <FaBell /> },
 
     { title: " Resources", href: "/dashboard/resources", icon: <FaFolder /> },
+    { title: "Chat", href: "/dashboard/chat", icon: <TbMessageChatbot /> },
     {
       title: "Settings",
       href: "/dashboard/settings",

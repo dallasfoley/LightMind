@@ -52,6 +52,7 @@ export default function ReminderSwitch({
       onCheckedChange={onSwitch}
       disabled={isLoading}
       aria-label={`Mark reminder as ${isChecked ? "incomplete" : "complete"}`}
+      className="data-[state=checked]:bg-green-500"
     />
   );
 }

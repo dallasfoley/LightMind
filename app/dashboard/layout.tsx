@@ -6,6 +6,7 @@ import {
   CustomThemeProvider,
   ThemeProvider,
 } from "@/components/theme-provider";
+import ChatButton from "@/components/chat/chat-button";
 
 export default async function DashboardLayout({
   children,
@@ -28,6 +29,7 @@ export default async function DashboardLayout({
             <main className="flex-1 overflow-x-hidden overflow-y-auto">
               <div className="container mx-auto px-6 py-8">{children}</div>
             </main>
+            <ChatButton />
           </div>
         </div>
       </CustomThemeProvider>

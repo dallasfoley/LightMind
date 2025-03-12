@@ -19,6 +19,7 @@ import type {
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
 import type { UserType } from "@/schema/userSchema";
+import { FadeLoader } from "react-spinners";
 
 type FieldType = "mood" | "energy" | "sleepQuality" | "sleepHours" | "stress";
 
@@ -197,7 +198,7 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
         <CardContent className="p-4 h-[300px]">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <p>Loading data...</p>
+              <FadeLoader />
             </div>
           ) : data.length === 0 ? (
             <div className="flex items-center justify-center h-full">

@@ -34,7 +34,7 @@ export default function HeroPage() {
 
       <HeroCards />
       <div className="flex flex-col md:flex-row gap-4 items-center my-4 md:my-8">
-        <Button className="md:h-10 bg-white text-black z-10 hover:text-white">
+        <Button className="md:h-10 bg-white text-black z-10 hover:text-white hover:scale-110 transition duration-300">
           <Link href="sign-up">
             <h2 className="md:text-lg flex items-center justify-between">
               Create an account to get started!
