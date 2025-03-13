@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 import { useRef, useEffect } from "react";
 import { Send, Bot, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,15 +11,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import SuggestedPrompts from "@/components/chat/suggested-prompts";
-import { MessageType } from "@/schema/messageSchema";
 
 export default function ChatInterfaceFull() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -30,20 +23,22 @@ export default function ChatInterfaceFull() {
     input,
     handleInputChange,
     handleSubmit,
-    isLoading,
+    status,
     error,
     setInput,
   } = useChat({
     api: "/api/chat",
-    onError: (err: Error) => {
+    onError: (err) => {
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: err.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
-      console.error(err);
+      console.error("Chat error:", err);
     },
   });
+
+  const isLoading = status === "submitted";
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -95,7 +90,7 @@ export default function ChatInterfaceFull() {
               <SuggestedPrompts onSelectPrompt={handleSelectPrompt} />
             </div>
           ) : (
-            messages.map((message: MessageType) => (
+            messages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -149,21 +144,16 @@ export default function ChatInterfaceFull() {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
           />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={isLoading || !input.trim()}
-                >
-                  <Send className="h-4 w-4" />
-                  <span className="sr-only">Send</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Send message</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+
+          <Button
+            type="submit"
+            size="icon"
+            disabled={isLoading || !input.trim()}
+            className="hover:bg-red-500"
+          >
+            <Send className="h-4 w-4 text-black" />
+            <span className="sr-only">Send</span>
+          </Button>
         </form>
       </CardFooter>
     </Card>

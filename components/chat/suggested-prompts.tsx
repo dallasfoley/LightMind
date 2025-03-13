@@ -26,7 +26,7 @@ export default function SuggestedPrompts({
           variant="outline"
           size="sm"
           onClick={() => onSelectPrompt(prompt)}
-          className="text-xs"
+          className="text-sm hover:bg-zinc-200"
         >
           {prompt}
         </Button>

@@ -1,13 +1,11 @@
-import { OpenAIStream, StreamingTextResponse } from "ai"; //
+import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { getUser } from "@/server/actions/users/getUser";
 import { db } from "@/lib/db";
 import { CheckInTable, JournalTable, RemindersTable } from "@/drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import { format } from "date-fns";
-import { MessageType } from "@/schema/messageSchema";
 
 // Define the system prompt for the mental health assistant
 const SYSTEM_PROMPT = `
@@ -57,22 +55,17 @@ USER CONTEXT:
 ${userData}
 `;
 
-    // Generate the response using the AI SDK
-    const response = await generateText({
+    // Use streamText from AI SDK 4.0
+    const result = streamText({
       model: openai("gpt-4o"),
       system: enhancedSystemPrompt,
-      prompt: messages
-        .map((message: MessageType) => message.content)
-        .join("\n"),
+      messages: messages,
       temperature: 0.7,
       maxTokens: 1000,
     });
 
-    // Create a stream from the response
-    const stream = OpenAIStream(response);
-
-    // Return the streaming response
-    return new StreamingTextResponse(stream);
+    // Return the streaming response using the correct method
+    return result.toDataStreamResponse();
   } catch (error) {
     console.error("Error in chat API:", error);
     return NextResponse.json(

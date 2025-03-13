@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,32 +11,27 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { MessageType } from "@/schema/messageSchema";
 
 export default function ChatInterface() {
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
+  const { messages, input, handleInputChange, handleSubmit, status, error } =
     useChat({
       api: "/api/chat",
-      onError: (err: Error) => {
+      onError: (err) => {
         toast({
           title: "Error",
-          description: "Something went wrong. Please try again.",
+          description: err.message || "Something went wrong. Please try again.",
           variant: "destructive",
         });
-        console.error(err);
+        console.error("Chat error:", err);
       },
     });
+
+  const isLoading = status === "submitted";
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -99,7 +94,7 @@ export default function ChatInterface() {
                   </p>
                 </div>
               ) : (
-                messages.map((message: MessageType) => (
+                messages.map((message) => (
                   <div
                     key={message.id}
                     className={cn(
@@ -117,10 +112,8 @@ export default function ChatInterface() {
                       )}
                       <div
                         className={cn(
-                          "rounded-lg px-3 py-2 text-sm",
-                          message.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
+                          "rounded-lg px-3 py-2 text-sm text-black",
+                          message.role === "user" ? "bg-primary" : "bg-muted"
                         )}
                       >
                         {message.content}
@@ -153,21 +146,16 @@ export default function ChatInterface() {
                 onKeyDown={handleKeyDown}
                 disabled={isLoading}
               />
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="submit"
-                      size="icon"
-                      disabled={isLoading || !input.trim()}
-                    >
-                      <Send className="h-4 w-4" />
-                      <span className="sr-only">Send</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Send message</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+
+              <Button
+                type="submit"
+                size="icon"
+                disabled={isLoading || !input.trim()}
+                className="text-black hover:bg-red-500"
+              >
+                <Send className="h-4 w-4 " />
+                <span className="sr-only">Send</span>
+              </Button>
             </form>
           </CardFooter>
         </Card>
