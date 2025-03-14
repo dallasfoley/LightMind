@@ -1,5 +1,5 @@
 import { resources } from "@/lib/constants";
-import Resource from "@/components/dashboard/resources/resource";
+import Resource from "@/components/resources/resource";
 import Link from "next/link";
 
 export default function ResourcesPage() {

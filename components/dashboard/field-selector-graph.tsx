@@ -194,7 +194,7 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
         </TabsList>
       </Tabs>
 
-      <Card className="p-2">
+      <Card className="p-2 dark:bg-zinc-900">
         <CardContent className="p-4 h-[300px]">
           {loading ? (
             <div className="flex items-center justify-center h-full">

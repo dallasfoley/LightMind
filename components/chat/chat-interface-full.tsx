@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useChat } from "@ai-sdk/react";
 import { useRef, useEffect } from "react";
-import { Send, Bot, Sparkles } from "lucide-react";
+import { Send, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import SuggestedPrompts from "@/components/chat/suggested-prompts";
+import ChatbotIcon from "../dashboard/card-content/chatbot-icon";
 
 export default function ChatInterfaceFull() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -78,12 +79,14 @@ export default function ChatInterfaceFull() {
         </CardTitle>
       </CardHeader>
 
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 overflow-visible">
         <div className="space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center py-8">
-              <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-              <p className="text-muted-foreground mb-4">
+            <div className="text-center py-8 overflow-visible">
+              <div className="my-6">
+                <ChatbotIcon />
+              </div>
+              <p className="text-muted-foreground my-4">
                 Hi! I&apos;m your mental health assistant. How can I help you
                 today?
               </p>

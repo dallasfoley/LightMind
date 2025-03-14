@@ -14,8 +14,8 @@ export default function HeroPage() {
     <LampContainer>
       <h3 className="flex items-center text-xl md:text-4xl -translate-y-10">
         <Image
-          src={"/brain-logo.png"}
-          alt=""
+          src="/brain-logo.png"
+          alt="logo"
           height={64}
           width={64}
           className="mr-4"

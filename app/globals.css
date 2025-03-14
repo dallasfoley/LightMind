@@ -63,6 +63,10 @@ body {
   .dark .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: #374151;
   }
+
+  .drop-shadow-glow {
+    filter: drop-shadow(0 0 30px rgba(245, 223, 77, 0.8));
+  }
 }
 
 /* Add this to your globals.css file */
@@ -134,6 +138,27 @@ body {
   gap: -1px;
   z-index: 1;
   animation: flash 10s linear infinite;
+}
+
+.glow-container::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: 0 0 75px 37px rgba(245, 223, 77, 1);
+  animation: pulse 2s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 75px 37px rgba(245, 223, 77, 1);
+  }
+  50% {
+    box-shadow: 0 0 35px 15px rgba(245, 223, 77, 0.7);
+  }
 }
 
 .metal-wire {

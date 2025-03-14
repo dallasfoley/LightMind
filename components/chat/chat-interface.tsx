@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useChat } from "@ai-sdk/react";
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, Sparkles, X } from "lucide-react";
+import { Send, Bot, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,6 +12,7 @@ import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import ChatbotIcon from "../dashboard/card-content/chatbot-icon";
 
 export default function ChatInterface() {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +88,10 @@ export default function ChatInterface() {
             <div className="space-y-4">
               {messages.length === 0 ? (
                 <div className="text-center py-8">
-                  <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                  <div className="my-6">
+                    <ChatbotIcon />
+                  </div>
+
                   <p className="text-muted-foreground">
                     Hi! I&apos;m your mental health assistant. How can I help
                     you today?

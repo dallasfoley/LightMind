@@ -35,7 +35,7 @@ export default function ChatPage() {
         </Card>
 
         <Card className="h-[500px] flex flex-col">
-          <CardContent className="flex-1 p-0 overflow-hidden">
+          <CardContent className="flex-1 p-0">
             <ChatInterfaceFull />
           </CardContent>
         </Card>
