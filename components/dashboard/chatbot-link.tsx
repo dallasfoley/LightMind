@@ -5,7 +5,7 @@ export function ChatbotLink() {
   return (
     <Link
       href="/dashboard/chat"
-      className="flex justify-center items-center p-0 bg-transparent hover:bg-transparent"
+      className="h-full w-full flex justify-center items-center p-0 bg-transparent hover:bg-transparent"
       prefetch
     >
       <ChatbotIcon />

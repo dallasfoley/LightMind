@@ -14,8 +14,17 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import ChatbotIcon from "../dashboard/card-content/chatbot-icon";
 
-export default function ChatInterface() {
-  const [isOpen, setIsOpen] = useState(false);
+// Accept props for external control
+export default function ChatInterface({
+  defaultOpen = false,
+  onToggle,
+  hideButtons = false,
+}: {
+  defaultOpen: boolean;
+  onToggle: (newState: boolean) => void;
+  hideButtons: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -61,14 +70,24 @@ export default function ChatInterface() {
   };
 
   const toggleChat = () => {
-    setIsOpen(!isOpen);
+    const newState = !isOpen;
+    setIsOpen(newState);
+    if (onToggle) {
+      onToggle(newState);
+    }
   };
 
+  // If not open and buttons are hidden, don't render anything
+  if (!isOpen && hideButtons) {
+    return null;
+  }
+
+  // If not open and showing buttons, show just the open button
   if (!isOpen) {
     return (
       <Button
         onClick={toggleChat}
-        className="fixed bottom-4 right-4 rounded-full w-14 h-14 p-0 shadow-lg"
+        className="fixed bottom-4 right-4 rounded-full w-14 h-14 p-0 shadow-lg bg-blue-600 hover:bg-blue-800 text-white"
         size="icon"
       >
         <Bot className="h-6 w-6" />
@@ -78,14 +97,16 @@ export default function ChatInterface() {
 
   return (
     <>
-      {/* Chat button */}
-      <Button
-        onClick={toggleChat}
-        className="fixed bottom-4 right-4 rounded-full w-14 h-14 p-0 shadow-lg"
-        size="icon"
-      >
-        <X className="h-6 w-6" />
-      </Button>
+      {/* Chat button - only show if not hiding buttons */}
+      {!hideButtons && (
+        <Button
+          onClick={toggleChat}
+          className="fixed bottom-4 right-4 rounded-full w-14 h-14 p-0 shadow-lg bg-blue-600 hover:bg-blue-800 text-white"
+          size="icon"
+        >
+          <X className="h-6 w-6" />
+        </Button>
+      )}
 
       {/* Chat interface */}
       <Card className="fixed bottom-20 right-4 w-80 md:w-96 h-[500px] shadow-xl flex flex-col">
