@@ -7,7 +7,6 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatbotLink } from "@/components/dashboard/chatbot-link";
 
-// Add metadata for better SEO
 export const metadata = {
   title: "Dashboard | LightMind",
   description: "View your mental health data and insights",
@@ -16,17 +15,47 @@ export const metadata = {
 export default async function DashboardPage() {
   const user = await getUser();
 
-  // Use the consolidated data fetching function
   const dashboardData = user ? await getDashboardData(user) : null;
 
-  const transformedCheckIns = dashboardData?.recentCheckIns?.map((checkIn) => ({
-    ...checkIn,
-    date: new Date(checkIn.date),
-  }));
+  const transformedCheckIns =
+    dashboardData?.recentCheckIns?.map((checkIn) => ({
+      ...checkIn,
+      date: new Date(checkIn.date),
+    })) || [];
+
+  const transformedTodayReminders =
+    dashboardData?.todaysReminders?.map((reminder) => ({
+      ...reminder,
+      completed: reminder.completed ?? false,
+    })) || [];
+
+  const transformedUpcomingReminders =
+    dashboardData?.upcomingReminders?.map((reminder) => ({
+      ...reminder,
+      completed: reminder.completed ?? false,
+    })) || [];
+
+  const transformedDashboardData = dashboardData
+    ? {
+        ...dashboardData,
+        recentCheckIns: transformedCheckIns,
+        todaysReminders: transformedTodayReminders,
+        upcomingReminders: transformedUpcomingReminders,
+        todaysJournal: dashboardData.todaysJournal
+          ? {
+              ...dashboardData.todaysJournal,
+              date: new Date(dashboardData.todaysJournal.date),
+              title: dashboardData.todaysJournal.title ?? undefined,
+            }
+          : null,
+      }
+    : null;
 
   return (
     <div className="space-y-4">
-      {user && <NavLinks user={user} />}
+      {user && (
+        <NavLinks user={user} dashboardData={transformedDashboardData} />
+      )}
       <div className="grid gap-4 md:grid-cols-2">
         <Card className=" dark:bg-zinc-800">
           <CardHeader>

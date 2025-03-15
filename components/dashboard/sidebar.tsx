@@ -84,7 +84,7 @@ export default function Sidebar({ user }: { user: UserType }) {
                     : "text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                 )}
               >
-                <Link href={item.href}>
+                <Link href={item.href} prefetch>
                   <span className="flex gap-4">
                     {item.icon} {item.title}
                   </span>

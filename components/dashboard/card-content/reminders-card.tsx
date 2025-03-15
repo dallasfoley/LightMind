@@ -1,11 +1,15 @@
+import { ReminderType } from "@/schema/reminderSchema";
 import type { UserType } from "@/schema/userSchema";
-import { getReminders } from "@/server/actions/reminders/getReminders";
 
-export default async function RemindersCard({ user }: { user: UserType }) {
-  const reminders = await getReminders(user, true);
-
+export default async function RemindersCard({
+  user,
+  reminders,
+}: {
+  user: UserType;
+  reminders: ReminderType[];
+}) {
   console.log("reminders: ", reminders);
-  if (!reminders)
+  if (!user || !reminders)
     return <p className="text-red-500 text-center">Error loading reminders</p>;
 
   return (

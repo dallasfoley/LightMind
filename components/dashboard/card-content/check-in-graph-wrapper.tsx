@@ -1,8 +1,8 @@
 "use client";
 
-import { CheckInDataType } from "@/schema/checkInSchema";
 import dynamic from "next/dynamic";
 import { FadeLoader } from "react-spinners";
+import { FlexibleCheckInType } from "./check-in-card";
 const CheckInGraph = dynamic(() => import("./check-in-graph"), {
   ssr: false,
   loading: () => <FadeLoader />,
@@ -11,7 +11,7 @@ const CheckInGraph = dynamic(() => import("./check-in-graph"), {
 export default function CheckInGraphWrapper({
   data,
 }: {
-  data: CheckInDataType[];
+  data: FlexibleCheckInType[];
 }) {
   return <CheckInGraph data={data} />;
 }

@@ -1,13 +1,28 @@
 import { UserType } from "@/schema/userSchema";
-import { getCheckIns } from "@/server/actions/checkIns/getCheckIns";
 import CheckInGraphWrapper from "./check-in-graph-wrapper";
 
-export default async function CheckInCard({ user }: { user: UserType }) {
+export type FlexibleCheckInType = {
+  date: Date | string;
+  id: string;
+  mood: number;
+  energy: number;
+  sleepHours: number;
+  sleepQuality: number;
+  stress: number;
+  notes?: string | null;
+  userId: string;
+};
+
+export default async function CheckInCard({
+  user,
+  checkIns,
+}: {
+  user: UserType;
+  checkIns: FlexibleCheckInType[];
+}) {
   if (!user) {
     return <p>User not found. Please log in.</p>;
   }
-
-  const checkIns = await getCheckIns(user, 7, true);
 
   return (
     <>

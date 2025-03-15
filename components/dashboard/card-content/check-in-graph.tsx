@@ -11,12 +11,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { CheckInDataType } from "@/schema/checkInSchema";
 import type {
   NameType,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
 import { format } from "date-fns";
+import { FlexibleCheckInType } from "./check-in-card";
 
 // Define the type for our formatted chart data
 type ChartData = {
@@ -47,7 +47,11 @@ const CustomTooltip = ({
   return null;
 };
 
-export default function CheckInGraph({ data }: { data: CheckInDataType[] }) {
+export default function CheckInGraph({
+  data,
+}: {
+  data: FlexibleCheckInType[];
+}) {
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
   useEffect(() => {

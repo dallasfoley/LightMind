@@ -9,38 +9,79 @@ import { Suspense } from "react";
 import LightBulbIcon from "./card-content/lightbulb-icon";
 import { FadeLoader } from "react-spinners";
 import CustomizationIcon from "./card-content/customization-icon";
-import { db } from "@/lib/db";
-import { CheckInTable } from "@/drizzle/schema";
-import { and, eq } from "drizzle-orm";
-import { format } from "date-fns";
+import type { ReminderType } from "@/schema/reminderSchema";
+import type { JournalEntryType } from "@/schema/journalEntrySchema";
 
-export default async function NavLinks({ user }: { user: UserType }) {
-  const today = format(new Date(), "yyyy-MM-dd");
-  const checkIn = await db
-    .select()
-    .from(CheckInTable)
-    .where(and(eq(CheckInTable.date, today), eq(CheckInTable.userId, user.id)));
+// Replace the DashboardDataType definition with this more specific one
+type CheckInWithDateString = {
+  date: string;
+  id: string;
+  mood: number;
+  energy: number;
+  sleepHours: number;
+  sleepQuality: number;
+  stress: number;
+  notes: string | null;
+  userId: string;
+};
 
-  const checkedInToday = checkIn.length > 0 ? true : false;
+type CheckInWithDateObject = Omit<CheckInWithDateString, "date"> & {
+  date: Date;
+};
+
+type DashboardDataType = {
+  todaysCheckIn: CheckInWithDateString | null;
+  recentCheckIns: CheckInWithDateObject[]; // Specifically typed for transformed dates
+  todaysJournal: JournalEntryType | null;
+  todaysReminders: ReminderType[];
+  upcomingReminders: ReminderType[];
+  checkedInToday: boolean;
+  journalStreak: number;
+  hasJournaledRecently?: boolean;
+} | null;
+
+export default function NavLinks({
+  user,
+  dashboardData,
+}: {
+  user: UserType;
+  dashboardData: DashboardDataType;
+}) {
+  const checkedInToday = dashboardData?.checkedInToday || false;
 
   const links = [
     {
       title: "Check-In",
       link: !checkedInToday ? "check-in" : "check-in/update",
       color: "bg-blue-100 dark:bg-blue-900",
-      content: <CheckInCard user={user} />,
+      content: (
+        <CheckInCard
+          user={user}
+          checkIns={dashboardData?.recentCheckIns || []}
+        />
+      ),
     },
     {
       title: "Journal",
       link: "journal",
       color: "bg-green-100 dark:bg-green-900",
-      content: <JournalCard user={user} />,
+      content: (
+        <JournalCard
+          user={user}
+          journalStreak={dashboardData?.journalStreak || 0}
+        />
+      ),
     },
     {
       title: "Reminders",
       link: "reminders",
       color: "bg-yellow-100 dark:bg-yellow-900",
-      content: <RemindersCard user={user} />,
+      content: (
+        <RemindersCard
+          user={user}
+          reminders={dashboardData?.todaysReminders || []}
+        />
+      ),
     },
     {
       title: "Resources",
