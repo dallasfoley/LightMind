@@ -30,6 +30,7 @@ export default function ChatInterface() {
         });
         console.error("Chat error:", err);
       },
+      experimental_throttle: 50,
     });
 
   const isLoading = status === "submitted";
@@ -63,6 +64,18 @@ export default function ChatInterface() {
     setIsOpen(!isOpen);
   };
 
+  if (!isOpen) {
+    return (
+      <Button
+        onClick={toggleChat}
+        className="fixed bottom-4 right-4 rounded-full w-14 h-14 p-0 shadow-lg"
+        size="icon"
+      >
+        <Bot className="h-6 w-6" />
+      </Button>
+    );
+  }
+
   return (
     <>
       {/* Chat button */}
@@ -71,99 +84,97 @@ export default function ChatInterface() {
         className="fixed bottom-4 right-4 rounded-full w-14 h-14 p-0 shadow-lg"
         size="icon"
       >
-        {isOpen ? <X className="h-6 w-6" /> : <Bot className="h-6 w-6" />}
+        <X className="h-6 w-6" />
       </Button>
 
       {/* Chat interface */}
-      {isOpen && (
-        <Card className="fixed bottom-20 right-4 w-80 md:w-96 h-[500px] shadow-xl flex flex-col">
-          <CardHeader className="bg-primary text-primary-foreground py-3">
-            <CardTitle className="text-lg flex items-center">
-              <Bot className="mr-2 h-5 w-5" />
-              Mental Health Assistant
-            </CardTitle>
-          </CardHeader>
+      <Card className="fixed bottom-20 right-4 w-80 md:w-96 h-[500px] shadow-xl flex flex-col">
+        <CardHeader className="bg-primary text-primary-foreground py-3">
+          <CardTitle className="text-lg flex items-center">
+            <Bot className="mr-2 h-5 w-5" />
+            Mental Health Assistant
+          </CardTitle>
+        </CardHeader>
 
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="my-6">
-                    <ChatbotIcon />
-                  </div>
-
-                  <p className="text-muted-foreground">
-                    Hi! I&apos;m your mental health assistant. How can I help
-                    you today?
-                  </p>
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="my-6">
+                  <ChatbotIcon />
                 </div>
-              ) : (
-                messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={cn(
-                      "flex",
-                      message.role === "user" ? "justify-end" : "justify-start"
+
+                <p className="text-muted-foreground">
+                  Hi! I&apos;m your mental health assistant. How can I help you
+                  today?
+                </p>
+              </div>
+            ) : (
+              messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "flex",
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  )}
+                >
+                  <div className="flex items-start gap-2 max-w-[80%]">
+                    {message.role !== "user" && (
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          AI
+                        </AvatarFallback>
+                      </Avatar>
                     )}
-                  >
-                    <div className="flex items-start gap-2 max-w-[80%]">
-                      {message.role !== "user" && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            AI
-                          </AvatarFallback>
-                        </Avatar>
+                    <div
+                      className={cn(
+                        "rounded-lg px-3 py-2 text-sm text-black",
+                        message.role === "user" ? "bg-primary" : "bg-muted"
                       )}
-                      <div
-                        className={cn(
-                          "rounded-lg px-3 py-2 text-sm text-black",
-                          message.role === "user" ? "bg-primary" : "bg-muted"
-                        )}
-                      >
-                        {message.content}
-                      </div>
-                      {message.role === "user" && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-zinc-800 text-zinc-50">
-                            U
-                          </AvatarFallback>
-                        </Avatar>
-                      )}
+                    >
+                      {message.content}
                     </div>
+                    {message.role === "user" && (
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-zinc-800 text-zinc-50">
+                          U
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                   </div>
-                ))
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          </ScrollArea>
+                </div>
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
 
-          <CardFooter className="border-t p-3">
-            <form
-              onSubmit={handleSubmit}
-              className="flex w-full items-center space-x-2"
+        <CardFooter className="border-t p-3">
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full items-center space-x-2"
+          >
+            <Textarea
+              placeholder="Type your message..."
+              className="min-h-10 flex-1 resize-none"
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+            />
+
+            <Button
+              type="submit"
+              size="icon"
+              disabled={isLoading || !input.trim()}
+              className="text-black hover:bg-red-500"
             >
-              <Textarea
-                placeholder="Type your message..."
-                className="min-h-10 flex-1 resize-none"
-                value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                disabled={isLoading}
-              />
-
-              <Button
-                type="submit"
-                size="icon"
-                disabled={isLoading || !input.trim()}
-                className="text-black hover:bg-red-500"
-              >
-                <Send className="h-4 w-4 " />
-                <span className="sr-only">Send</span>
-              </Button>
-            </form>
-          </CardFooter>
-        </Card>
-      )}
+              <Send className="h-4 w-4 " />
+              <span className="sr-only">Send</span>
+            </Button>
+          </form>
+        </CardFooter>
+      </Card>
     </>
   );
 }

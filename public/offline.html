@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline | LightMind</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        background-color: #18181b;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+      }
+      .container {
+        max-width: 500px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+      }
+      .logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 2rem;
+      }
+      .button {
+        background-color: #6366f1;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .button:hover {
+        background-color: #4f46e5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="/brain-logo.png" alt="LightMind Logo" class="logo" />
+      <h1>You're Offline</h1>
+      <p>
+        It looks like you've lost your internet connection. Some features of
+        LightMind may not be available while you're offline.
+      </p>
+      <button class="button" onclick="window.location.reload()">
+        Try Again
+      </button>
+    </div>
+  </body>
+</html>

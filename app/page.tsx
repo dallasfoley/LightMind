@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { FlipWords } from "@/components/ui/flip-words";
 import HeroCards from "@/components/ui/hero-cards";
@@ -9,16 +7,27 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+// Add metadata for better SEO
+export const metadata = {
+  title: "LightMind - Mental Health Tracking",
+  description:
+    "Track, visualize, and improve your mental health with LightMind",
+};
+
+// Make this a static page with revalidation
+export const revalidate = 3600; // Revalidate every hour
+
 export default function HeroPage() {
   return (
     <LampContainer>
       <h3 className="flex items-center text-xl md:text-4xl -translate-y-10">
         <Image
-          src="/brain-logo.png"
-          alt="logo"
+          src={"/brain-logo.png"}
+          alt="LightMind Logo"
           height={64}
           width={64}
           className="mr-4"
+          priority
         />
         Welcome to LightMind
       </h3>
@@ -34,8 +43,11 @@ export default function HeroPage() {
 
       <HeroCards />
       <div className="flex flex-col md:flex-row gap-4 items-center my-4 md:my-8">
-        <Button className="md:h-10 bg-white text-black z-10 hover:text-white hover:scale-110 transition duration-300">
-          <Link href="sign-up">
+        <Button
+          asChild
+          className="md:h-10 bg-white text-black z-10 hover:bg-red-600 hover:text-white hover:scale-110 transition duration-300"
+        >
+          <Link href="/sign-up" prefetch={true}>
             <h2 className="md:text-lg flex items-center justify-between">
               Create an account to get started!
               <ArrowRight className="ml-2" />
@@ -49,8 +61,11 @@ export default function HeroPage() {
         <Separator className="w-16 md:w-32" />
       </div>
       <div className="flex flex-col md:flex-row gap-4 items-center my-4 md:my-8">
-        <Button className="md:h-10 bg-white text-black z-10 hover:text-white hover:scale-110 transition duration-300">
-          <Link href="sign-in">
+        <Button
+          asChild
+          className="md:h-10 bg-white text-black z-10 hover:bg-red-600 hover:text-white hover:scale-110 transition duration-300"
+        >
+          <Link href="/sign-in" prefetch={true}>
             <h2 className="md:text-lg flex items-center justify-between">
               Sign-in
               <ArrowRight className="ml-2" />

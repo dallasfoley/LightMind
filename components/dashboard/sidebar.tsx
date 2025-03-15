@@ -59,7 +59,7 @@ export default function Sidebar({ user }: { user: UserType }) {
     <div className="hidden md:w-[300px] bg-zinc-300 dark:bg-zinc-800 text-zinc-900 dark:text-white lg:block">
       <div className="flex h-full flex-col gap-2">
         <div className="flex h-[60px] items-center border-b px-6">
-          <Link href={"/dashboard"} className="flex items-center">
+          <Link href={"/dashboard"} className="flex items-center" prefetch>
             <h1 className="text-lg md:text-2xl font-semibold">LightMind</h1>
             <Image
               src={"/brain-logo.png"}

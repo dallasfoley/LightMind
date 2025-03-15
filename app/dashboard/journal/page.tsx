@@ -6,6 +6,11 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+export const metadata = {
+  title: "Dashboard | LightMind",
+  description: "View your mental health data and insights",
+};
+
 export default async function JournalPage() {
   const user = await getUser();
   const todaysEntries = user ? await getTodaysJournals(user) : null;

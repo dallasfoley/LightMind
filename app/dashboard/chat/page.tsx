@@ -10,7 +10,9 @@ import ChatInterfaceFull from "@/components/chat/chat-interface-full";
 export default function ChatPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-6">Mental Health Assistant</h1>
+      <h1 className="text-4xl font-bold mb-6 text-zinc-900 dark:text-zinc-200">
+        Mental Health Assistant
+      </h1>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>

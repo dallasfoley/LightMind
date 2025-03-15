@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AppearanceTab from "@/components/settings/appearance-tab";
 import AccountTab from "@/components/settings/account-tab";
+import NotificationsTab from "@/components/settings/notifications-tab";
 
 export default function SettingsForm() {
   const [mounted, setMounted] = useState(false);
@@ -12,6 +13,18 @@ export default function SettingsForm() {
   // Ensure we only render theme-dependent components after hydration
   useEffect(() => {
     setMounted(true);
+
+    // Check for tab query parameter
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (
+        tabParam &&
+        ["appearance", "account", "notifications"].includes(tabParam)
+      ) {
+        setActiveTab(tabParam);
+      }
+    }
   }, []);
 
   if (!mounted) {
@@ -29,9 +42,10 @@ export default function SettingsForm() {
         value={activeTab}
         onValueChange={setActiveTab}
       >
-        <TabsList className="grid w-full grid-cols-2 mb-8 bg-zinc-500 text-white">
+        <TabsList className="grid w-full grid-cols-3 mb-8 bg-zinc-500 text-white">
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="appearance">
@@ -40,6 +54,10 @@ export default function SettingsForm() {
 
         <TabsContent value="account">
           <AccountTab />
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <NotificationsTab />
         </TabsContent>
       </Tabs>
     </div>

@@ -13,13 +13,13 @@ import {
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { getCheckIns } from "@/server/actions/checkIns/getCheckIns";
+import { useCheckIns } from "@/hooks/use-check-ins";
 import type {
   NameType,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
-import type { UserType } from "@/schema/userSchema";
-import { FadeLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CheckInDataType } from "@/schema/checkInSchema";
 
 type FieldType = "mood" | "energy" | "sleepQuality" | "sleepHours" | "stress";
 
@@ -98,20 +98,24 @@ const CustomTooltip = ({
   return null;
 };
 
-export default function FieldSelectorGraph({ user }: { user: UserType }) {
+// Update the component to accept initial data
+export default function FieldSelectorGraph({
+  userId,
+  initialData = [],
+}: {
+  userId: string;
+  initialData?: CheckInDataType[];
+}) {
   const [selectedField, setSelectedField] = useState<FieldType>("mood");
   const [data, setData] = useState<ChartData[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const { checkIns, isLoading, isError } = useCheckIns(userId, initialData);
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      try {
-        const checkInData = await getCheckIns(user);
-        console.log("Raw check-in data:", checkInData);
-
-        // Transform data for the chart
-        const formattedData: ChartData[] = checkInData.map((item) => {
+    if (checkIns.length > 0) {
+      // Transform data for the chart
+      const formattedData: ChartData[] = checkIns.map(
+        (item: CheckInDataType) => {
           // Ensure date is a Date object
           const dateObj =
             item.date instanceof Date ? item.date : new Date(item.date);
@@ -136,34 +140,17 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
             sleepHours: item.sleepHours,
             stress: item.stress,
           };
-        });
+        }
+      );
 
-        // Sort data by date
-        const sortedData = [...formattedData].sort((a, b) => {
-          return a.sortDate.localeCompare(b.sortDate);
-        });
+      // Sort data by date
+      const sortedData = [...formattedData].sort((a, b) => {
+        return a.sortDate.localeCompare(b.sortDate);
+      });
 
-        console.log(
-          "Sorted data:",
-          sortedData.map((d) => ({
-            displayDate: d.displayDate,
-            sortDate: d.sortDate,
-            mood: d.mood,
-          }))
-        );
-
-        setData(sortedData);
-      } catch (error) {
-        console.error("Error fetching check-in data:", error);
-      } finally {
-        setLoading(false);
-      }
+      setData(sortedData);
     }
-
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
+  }, [checkIns]);
 
   const handleFieldChange = (value: string) => {
     setSelectedField(value as FieldType);
@@ -176,6 +163,14 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
     }
     return [0, 5];
   };
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <p>Error loading data. Please try again later.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -196,9 +191,9 @@ export default function FieldSelectorGraph({ user }: { user: UserType }) {
 
       <Card className="p-2 dark:bg-zinc-900">
         <CardContent className="p-4 h-[300px]">
-          {loading ? (
+          {isLoading ? (
             <div className="flex items-center justify-center h-full">
-              <FadeLoader />
+              <Skeleton className="h-[250px] w-full" />
             </div>
           ) : data.length === 0 ? (
             <div className="flex items-center justify-center h-full">

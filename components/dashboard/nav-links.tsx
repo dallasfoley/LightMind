@@ -67,7 +67,7 @@ export default async function NavLinks({ user }: { user: UserType }) {
             </div>
           }
         >
-          <Link href={`/dashboard/${link.link}`}>
+          <Link href={`/dashboard/${link.link}`} prefetch>
             <Card
               className={`${link.color} aspect-square hover:shadow-md transition-shadow duration-200 ease-in-out p-2`}
             >

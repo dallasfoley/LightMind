@@ -1,12 +1,20 @@
 import type React from "react";
-import Header from "@/components/dashboard/header";
-import Sidebar from "@/components/dashboard/sidebar";
 import { getUser } from "@/server/actions/users/getUser";
 import {
   CustomThemeProvider,
   ThemeProvider,
 } from "@/components/theme-provider";
 import ChatButton from "@/components/chat/chat-button";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DynamicHeader = dynamic(() => import("@/components/dashboard/header"), {
+  loading: () => <Skeleton style={{ height: 60 }} />,
+});
+
+const DynamicSidebar = dynamic(() => import("@/components/dashboard/sidebar"), {
+  loading: () => <Skeleton style={{ width: 240 }} />,
+});
 
 export default async function DashboardLayout({
   children,
@@ -23,9 +31,9 @@ export default async function DashboardLayout({
     >
       <CustomThemeProvider>
         <div className="flex h-screen overflow-hidden">
-          {user && <Sidebar user={user} />}
+          {user && <DynamicSidebar user={user} />}
           <div className="flex flex-col flex-1 overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-            <Header />
+            <DynamicHeader />
             <main className="flex-1 overflow-x-hidden overflow-y-auto">
               <div className="container mx-auto px-6 py-8">{children}</div>
             </main>
