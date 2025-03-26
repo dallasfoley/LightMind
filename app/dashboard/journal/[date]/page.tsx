@@ -13,10 +13,12 @@ import type { Metadata } from "next";
 export async function generateMetadata({
   params,
 }: {
-  params: { date: string };
+  params: Promise<{ date: string }>;
 }): Promise<Metadata> {
+  const { date } = await params;
+
   return {
-    title: `Journal Entry - ${params.date} | LightMind`,
+    title: `Journal Entry - ${date} | LightMind`,
     description: "View your journal entry and reflect on your thoughts",
   };
 }
