@@ -7,7 +7,7 @@ import {
   RemindersTable,
   UserTable,
 } from "@/drizzle/schema";
-import { eq, and, gte, desc } from "drizzle-orm";
+import { eq, and, gte, asc } from "drizzle-orm";
 import { format, startOfDay, endOfDay, subDays } from "date-fns";
 import type { UserType } from "@/schema/userSchema";
 
@@ -67,7 +67,7 @@ export async function getDashboardData(user: UserType) {
             gte(CheckInTable.date, format(sevenDaysAgo, "yyyy-MM-dd"))
           )
         )
-        .orderBy(desc(CheckInTable.date))
+        .orderBy(asc(CheckInTable.date))
         .limit(7),
 
       // Today's journal entry

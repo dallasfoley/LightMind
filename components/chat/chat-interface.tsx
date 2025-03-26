@@ -109,7 +109,7 @@ export default function ChatInterface({
       )}
 
       {/* Chat interface */}
-      <Card className="fixed bottom-20 right-4 w-80 md:w-96 h-[500px] shadow-xl flex flex-col">
+      <Card className="fixed bottom-20 right-4 w-72 md:w-96 h-[500px] shadow-xl flex flex-col">
         <CardHeader className="bg-primary text-primary-foreground py-3">
           <CardTitle className="text-lg flex items-center">
             <Bot className="mr-2 h-5 w-5" />

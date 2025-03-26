@@ -34,12 +34,12 @@ export default async function RemindersPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-bold text-zinc-900 dark:zinc-200">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-200 dark:zinc-200">
           Reminders
         </h1>
         <Button
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium mt-2 md:mt-0 py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           asChild
         >
           <Link href="/dashboard/reminders/new">Create New Reminder</Link>

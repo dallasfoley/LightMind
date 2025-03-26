@@ -7,8 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "Dashboard | LightMind",
-  description: "View your mental health data and insights",
+  title: "Journal | LightMind",
+  description: "Journal!",
 };
 
 export default async function JournalPage() {
@@ -33,7 +33,7 @@ export default async function JournalPage() {
               {user && (
                 <>
                   <div className="flex items-center mb-8">
-                    <div className="w-full flex justify-between items-center">
+                    <div className="w-full flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
                       <h3 className="text-slate-500 dark:text-slate-400 text-sm">
                         {new Date().toLocaleDateString("en-US", {
                           weekday: "long",
@@ -42,7 +42,6 @@ export default async function JournalPage() {
                           day: "numeric",
                         })}
                       </h3>
-
                       <Button
                         variant="outline"
                         className="text-black hover:bg-zinc-300"

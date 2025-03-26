@@ -72,21 +72,21 @@ export default function ChatInterfaceFull() {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="bg-primary text-primary-foreground py-3">
-        <CardTitle className="text-lg flex items-center">
-          <Bot className="mr-2 h-5 w-5" />
+      <CardHeader className="bg-primary text-primary-foreground py-2 md:py-3">
+        <CardTitle className="text-base md:text-lg flex items-center">
+          <Bot className="mr-2 h-4 w-4 md:h-5 md:w-5" />
           Mental Health Assistant
         </CardTitle>
       </CardHeader>
 
-      <ScrollArea className="flex-1 p-4 overflow-visible">
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 p-3 md:p-4 overflow-visible">
+        <div className="space-y-3 md:space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center py-8 overflow-visible">
-              <div className="my-6">
+            <div className="text-center py-4 md:py-8 overflow-visible">
+              <div className="my-4 md:my-6">
                 <ChatbotIcon />
               </div>
-              <p className="text-muted-foreground my-4">
+              <p className="text-muted-foreground my-2 md:my-4 text-sm md:text-base">
                 Hi! I&apos;m your mental health assistant. How can I help you
                 today?
               </p>
@@ -101,17 +101,17 @@ export default function ChatInterfaceFull() {
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
               >
-                <div className="flex items-start gap-2 max-w-[80%]">
+                <div className="flex items-start gap-2 max-w-[85%] md:max-w-[80%]">
                   {message.role !== "user" && (
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-primary-foreground">
+                    <Avatar className="h-7 w-7 md:h-8 md:w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs md:text-sm">
                         AI
                       </AvatarFallback>
                     </Avatar>
                   )}
                   <div
                     className={cn(
-                      "rounded-lg px-3 py-2 text-sm",
+                      "rounded-lg px-2 py-1.5 md:px-3 md:py-2 text-xs md:text-sm",
                       message.role === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted"
@@ -120,8 +120,8 @@ export default function ChatInterfaceFull() {
                     {message.content}
                   </div>
                   {message.role === "user" && (
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-zinc-800 text-zinc-50">
+                    <Avatar className="h-7 w-7 md:h-8 md:w-8">
+                      <AvatarFallback className="bg-zinc-800 text-zinc-50 text-xs md:text-sm">
                         U
                       </AvatarFallback>
                     </Avatar>
@@ -134,14 +134,14 @@ export default function ChatInterfaceFull() {
         </div>
       </ScrollArea>
 
-      <CardFooter className="border-t p-3">
+      <CardFooter className="border-t p-2 md:p-3">
         <form
           onSubmit={handleSubmit}
           className="flex w-full items-center space-x-2"
         >
           <Textarea
             placeholder="Type your message..."
-            className="min-h-10 flex-1 resize-none"
+            className="min-h-8 md:min-h-10 flex-1 resize-none text-sm md:text-base py-1.5 md:py-2"
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
@@ -152,9 +152,9 @@ export default function ChatInterfaceFull() {
             type="submit"
             size="icon"
             disabled={isLoading || !input.trim()}
-            className="hover:bg-red-500"
+            className="hover:bg-red-500 h-8 w-8 md:h-10 md:w-10"
           >
-            <Send className="h-4 w-4 text-black" />
+            <Send className="h-3.5 w-3.5 md:h-4 md:w-4 text-black" />
             <span className="sr-only">Send</span>
           </Button>
         </form>
