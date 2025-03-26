@@ -36,7 +36,6 @@ export default function ChatPage() {
 
       {/* Desktop grid layout */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Info card - hidden on mobile */}
         <Card className="hidden md:block">
           <CardHeader>
             <CardTitle>How can I help you?</CardTitle>
