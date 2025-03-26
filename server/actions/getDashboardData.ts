@@ -11,7 +11,6 @@ import { eq, and, gte, asc } from "drizzle-orm";
 import { format, startOfDay, endOfDay, subDays } from "date-fns";
 import type { UserType } from "@/schema/userSchema";
 
-// Consolidated function to get all dashboard data in a single request
 export async function getDashboardData(user: UserType) {
   if (!user) {
     return {
