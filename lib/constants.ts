@@ -42,4 +42,16 @@ export const resources = [
     text: "435748",
     TTY: "(800)-487-4889",
   },
+  {
+    title: "Find an AA Meeting Near You",
+    number: "(800)-934-9518",
+    meeting: "https://sober.com/find-a-meeting/",
+    description: "The only requirement to join is a desire to stop drinking!",
+  },
+  {
+    title: "Find an NA Meeting Near You",
+    number: "(844)-310-9590",
+    meeting: "https://www.na-meetings.com/",
+    description: "The only requirement to join is a desire to stop using!",
+  },
 ];

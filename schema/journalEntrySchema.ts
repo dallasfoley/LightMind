@@ -5,7 +5,7 @@ export const JournalEntryFormSchema = z.object({
   date: z.date().refine((date) => date <= new Date(), {
     message: "Date must not be in the future",
   }),
-  content: z.string(),
+  content: z.string().min(1, { message: "Content is required" }),
 });
 
 export type JournalEntryFormType = z.infer<typeof JournalEntryFormSchema>;

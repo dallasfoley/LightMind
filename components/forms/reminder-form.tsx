@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReminderFormSchema } from "@/schema/reminderSchema";
-import { submitReminder } from "@/server/actions/submitReminder";
+import { submitReminder } from "@/server/actions/reminders/submitReminder";
 
 interface ReminderFormProps {
   userId: string;
@@ -46,14 +46,18 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
     defaultValues: {
       title: "",
       description: "",
-      datetime: "",
+      datetime: new Date(),
       completed: false,
     },
   });
 
   const handleSubmit = async (formData: z.infer<typeof ReminderFormSchema>) => {
-    await submitReminder(formData, userId);
-    router.replace("/dashboard/reminders");
+    try {
+      await submitReminder(formData, userId);
+      router.replace("/dashboard/reminders");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Generate time options in 30-minute intervals
@@ -105,13 +109,14 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                       className="h-32 resize-none"
                       placeholder="Enter a description (optional)"
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <FormField
                 control={form.control}
                 name="datetime"
@@ -130,7 +135,7 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                             }`}
                           >
                             {field.value ? (
-                              format(new Date(field.value), "PPP")
+                              format(field.value, "PPP")
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -141,13 +146,17 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={
-                            field.value ? new Date(field.value) : undefined
-                          }
+                          selected={field.value}
                           onSelect={(date) => {
                             if (date) {
-                              date.setHours(0, 0, 0, 0);
-                              field.onChange(date.toISOString());
+                              const currentTime = field.value || new Date();
+                              date.setHours(
+                                currentTime.getHours(),
+                                currentTime.getMinutes(),
+                                0,
+                                0
+                              );
+                              field.onChange(date);
                             }
                           }}
                           disabled={(date) => {
@@ -176,12 +185,10 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                     <Select
                       onValueChange={(time) => {
                         const [hours, minutes] = time.split(":").map(Number);
-                        const date = field.value
-                          ? new Date(field.value)
-                          : new Date();
+                        const date = field.value || new Date();
                         date.setHours(hours);
                         date.setMinutes(minutes);
-                        field.onChange(date.toISOString());
+                        field.onChange(date);
                       }}
                       value={
                         field.value
@@ -215,7 +222,10 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
               Create Reminder
             </Button>
           </form>

@@ -37,7 +37,7 @@ export const RemindersTable = pgTable("reminders", {
   userId: uuid("userId")
     .references(() => UserTable.id)
     .notNull(),
-  completed: boolean("completed"),
+  completed: boolean("completed").default(false),
 });
 
 export const JournalTable = pgTable("journals", {

@@ -1,9 +1,15 @@
+import { ReminderType } from "@/schema/reminderSchema";
 import type { UserType } from "@/schema/userSchema";
-import { getReminders } from "@/server/actions/getReminders";
 
-export default async function RemindersCard({ user }: { user: UserType }) {
-  const reminders = await getReminders(user, true);
-  if (!reminders)
+export default async function RemindersCard({
+  user,
+  reminders,
+}: {
+  user: UserType;
+  reminders: ReminderType[];
+}) {
+  console.log("reminders: ", reminders);
+  if (!user || !reminders)
     return <p className="text-red-500 text-center">Error loading reminders</p>;
 
   return (
@@ -18,7 +24,7 @@ export default async function RemindersCard({ user }: { user: UserType }) {
               {reminders.map((reminder, index) => (
                 <li
                   key={index}
-                  className="p-2 rounded-md bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700"
+                  className="p-2 flex items-center justify-between rounded-md bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700"
                 >
                   <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                     {reminder.title}
@@ -27,7 +33,7 @@ export default async function RemindersCard({ user }: { user: UserType }) {
                     {new Date(reminder.datetime).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
-                      hour12: false,
+                      hour12: true,
                     })}
                   </p>
                 </li>

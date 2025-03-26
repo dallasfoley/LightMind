@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
-import { createUser } from "@/server/actions/createUser"; // Import your database function
+import { createUser } from "@/server/actions/users/createUser"; // Import your database function
 import { ClerkUserType } from "@/schema/userSchema";
 
 export async function POST(req: Request) {
