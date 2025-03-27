@@ -1,66 +1,144 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import type { WebhookEvent } from "@clerk/nextjs/server";
 import { createUser } from "@/server/actions/users/createUser"; // Import your database function
-import { ClerkUserType } from "@/schema/userSchema";
+import type { ClerkUserType } from "@/schema/userSchema";
 
 export async function POST(req: Request) {
-  const SIGNING_SECRET = process.env.SIGNING_SECRET;
+  // 1. Get the webhook secret from environment variables
+  const WEBHOOK_SECRET =
+    process.env.CLERK_WEBHOOK_SECRET || process.env.SIGNING_SECRET;
 
-  if (!SIGNING_SECRET) {
-    throw new Error(
-      "Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env.local"
+  if (!WEBHOOK_SECRET) {
+    console.error(
+      "Missing CLERK_WEBHOOK_SECRET or SIGNING_SECRET environment variable"
     );
+    return new Response("Missing webhook secret", { status: 500 });
   }
 
-  const wh = new Webhook(SIGNING_SECRET);
+  // 2. Get the headers
   const headerPayload = await headers();
   const svix_id = headerPayload.get("svix-id");
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
 
+  // 3. Validate the headers
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Error: Missing Svix headers", { status: 400 });
+    console.error("Missing Svix headers", {
+      svix_id,
+      svix_timestamp,
+      svix_signature,
+    });
+    return new Response("Missing Svix headers", { status: 400 });
   }
 
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
-
-  let evt: WebhookEvent;
-
+  // 4. Get the body
+  let payload;
   try {
-    evt = wh.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
-    }) as WebhookEvent;
+    payload = await req.json();
   } catch (err) {
-    console.error("Error: Could not verify webhook:", err);
-    return new Response("Error: Verification error", { status: 400 });
+    console.error("Error parsing request body", err);
+    return new Response("Error parsing request body", { status: 400 });
   }
 
-  // *** Database Interaction ***
-  if (evt.type === "user.created") {
-    try {
+  // 5. Create the Svix headers object
+  const svixHeaders = {
+    "svix-id": svix_id,
+    "svix-timestamp": svix_timestamp,
+    "svix-signature": svix_signature,
+  };
+
+  // 6. Verify the webhook
+  let evt: WebhookEvent;
+  try {
+    const wh = new Webhook(WEBHOOK_SECRET);
+    const body = JSON.stringify(payload);
+
+    // Log some debug info (remove in production)
+    console.log("Webhook verification attempt:", {
+      secret_length: WEBHOOK_SECRET.length,
+      body_length: body.length,
+      headers: svixHeaders,
+    });
+
+    evt = wh.verify(body, svixHeaders) as WebhookEvent;
+  } catch (err) {
+    console.error("Webhook verification failed:", err);
+    return new Response(
+      `Webhook verification failed: ${
+        err instanceof Error ? err.message : "Unknown error"
+      }`,
+      {
+        status: 400,
+      }
+    );
+  }
+
+  // 7. Handle the webhook event
+  try {
+    const eventType = evt.type;
+    console.log(`Webhook event type: ${eventType}`);
+
+    if (eventType === "user.created") {
+      console.log("Processing user.created event");
+      const userData = evt.data as ClerkUserType;
+
       // Create the user in your database
-      console.log("evt.data: ", evt.data);
-      const newUser = await createUser(evt.data as ClerkUserType);
-
+      const newUser = await createUser(userData);
       console.log("User created in database:", newUser);
-      return new Response("User created", { status: 200 }); // Important: 200 status for success
-    } catch (dbError) {
-      console.error("Error creating user in database:", dbError);
-      return new Response("Error creating user in database", { status: 500 }); // 500 status for database error
-    }
-  } else if (evt.type === "user.updated") {
-    // Handle user updates if needed.  Similar to create, but use update logic.
-    // ...
-  } else if (evt.type === "user.deleted") {
-    // Handle user deletion if needed.
-    // ...
-  }
 
-  return new Response("Webhook received (no user.created event)", {
-    status: 200,
-  }); // Handle other event types or no action
+      return new Response(
+        JSON.stringify({ success: true, message: "User created" }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    } else if (eventType === "user.updated") {
+      // Handle user updates
+      console.log("Processing user.updated event");
+      // Implement your update logic here
+
+      return new Response(
+        JSON.stringify({ success: true, message: "User updated" }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    } else if (eventType === "user.deleted") {
+      // Handle user deletion
+      console.log("Processing user.deleted event");
+      // Implement your deletion logic here
+
+      return new Response(
+        JSON.stringify({ success: true, message: "User deleted" }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Handle other event types
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: `Webhook received: ${eventType}`,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    console.error("Error processing webhook:", error);
+    return new Response(
+      JSON.stringify({ success: false, error: "Error processing webhook" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 }
