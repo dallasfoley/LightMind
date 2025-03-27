@@ -196,7 +196,7 @@ export default function FieldSelectorGraph({
               <Skeleton className="h-[250px] w-full" />
             </div>
           ) : data.length === 0 ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full text-zinc-300">
               <p>No check-in data available. Start tracking your well-being!</p>
             </div>
           ) : (
