@@ -19,7 +19,8 @@ import type {
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckInDataType } from "@/schema/checkInSchema";
+import type { CheckInDataType } from "@/schema/checkInSchema";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 type FieldType = "mood" | "energy" | "sleepQuality" | "sleepHours" | "stress";
 
@@ -110,6 +111,7 @@ export default function FieldSelectorGraph({
   const [data, setData] = useState<ChartData[]>([]);
 
   const { checkIns, isLoading, isError } = useCheckIns(userId, initialData);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     if (checkIns.length > 0) {
@@ -180,13 +182,19 @@ export default function FieldSelectorGraph({
         onValueChange={handleFieldChange}
         className="w-full"
       >
-        <TabsList className="grid grid-cols-5 w-full">
-          {Object.entries(fieldLabels).map(([field, label]) => (
-            <TabsTrigger key={field} value={field}>
-              {label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="rounded-md border">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full">
+            {Object.entries(fieldLabels).map(([field, label]) => (
+              <TabsTrigger
+                key={field}
+                value={field}
+                className="px-2 py-1.5 text-xs md:text-sm"
+              >
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
       </Tabs>
 
       <Card className="p-2 dark:bg-zinc-900">
@@ -205,32 +213,35 @@ export default function FieldSelectorGraph({
                 data={data}
                 margin={{
                   top: 15,
-                  right: 20,
+                  right: isMobile ? 10 : 20,
                   bottom: 15,
-                  left: 45,
+                  left: isMobile ? 25 : 45,
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="displayDate"
-                  tick={{ fontSize: 12 }}
-                  height={40}
+                  tick={{ fontSize: isMobile ? 10 : 12 }}
+                  height={isMobile ? 30 : 40}
+                  tickFormatter={
+                    isMobile ? (value) => value.split(" ")[0] : undefined
+                  }
                 />
                 <YAxis
                   domain={getYDomain()}
-                  tick={{ fontSize: 12 }}
-                  width={45}
+                  tick={{ fontSize: isMobile ? 10 : 12 }}
+                  width={isMobile ? 30 : 45}
                   label={{
                     value: fieldLabels[selectedField],
                     angle: -90,
                     position: "insideLeft",
                     style: {
                       textAnchor: "middle",
-                      fontSize: "14px",
+                      fontSize: isMobile ? "12px" : "14px",
                       fill: "#666666",
                       fontWeight: 500,
                     },
-                    offset: -35,
+                    offset: isMobile ? -20 : -35,
                   }}
                 />
                 <Tooltip content={<CustomTooltip />} />
