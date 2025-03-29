@@ -32,6 +32,15 @@ body {
   }
 }
 
+/* Custom background styles */
+.custom-bg {
+  background-color: var(--background-custom-light, theme("colors.zinc.100"));
+}
+
+.dark .custom-bg {
+  background-color: var(--background-custom-dark, theme("colors.zinc.900"));
+}
+
 @layer base {
   * {
     @apply border-border;

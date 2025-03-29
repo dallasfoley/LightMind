@@ -35,7 +35,7 @@ export default async function DashboardLayout({
         <SidebarProvider>
           <div className="flex h-screen overflow-hidden">
             {user && <DynamicSidebar user={user} />}
-            <div className="flex flex-col flex-1 overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+            <div className="flex flex-col flex-1 overflow-hidden bg-zinc-100 dark:bg-zinc-900 custom-bg">
               <DynamicHeader />
               <main className="flex-1 overflow-x-hidden overflow-y-auto">
                 <div className="container mx-auto px-6 py-8">{children}</div>

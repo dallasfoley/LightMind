@@ -42,11 +42,13 @@ export default function SettingsForm() {
         value={activeTab}
         onValueChange={setActiveTab}
       >
-        <TabsList className="grid w-full grid-cols-3 mb-8 bg-zinc-500 text-white">
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-center mb-8">
+          <TabsList className="w-auto max-w-md bg-zinc-500 text-white">
+            <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="appearance">
           <AppearanceTab />
