@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import type { ThemeProviderProps } from "next-themes";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
@@ -23,12 +23,10 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 
 // Custom theme context for additional theme features
 type CustomThemeContextType = {
-  primaryColor: string;
-  setPrimaryColor: (color: string) => void;
-  secondaryColor: string;
-  setSecondaryColor: (color: string) => void;
-  accentColor: string;
-  setAccentColor: (color: string) => void;
+  customTheme: string;
+  setCustomTheme: (color: string) => void;
+  useCustomBackground: boolean;
+  setUseCustomBackground: (use: boolean) => void;
 };
 
 const CustomThemeContext = createContext<CustomThemeContextType | undefined>(
@@ -40,26 +38,45 @@ export function CustomThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [primaryColor, setPrimaryColor] = useState("#6366f1"); // Default indigo
-  const [secondaryColor, setSecondaryColor] = useState("#4f46e5"); // Default indigo
-  const [accentColor, setAccentColor] = useState("#818cf8"); // Default indigo
+  const [customTheme, setCustomTheme] = useState("#6366f1"); // Default indigo
+  const [useCustomBackground, setUseCustomBackground] = useState(false);
+  const { theme } = useTheme();
 
   // Apply custom colors to CSS variables
   useEffect(() => {
-    document.documentElement.style.setProperty("--primary", primaryColor);
-    document.documentElement.style.setProperty("--secondary", secondaryColor);
-    document.documentElement.style.setProperty("--accent", accentColor);
-  }, [primaryColor, secondaryColor, accentColor]);
+    // Always set the primary color
+    document.documentElement.style.setProperty("--primary", customTheme);
+
+    // Only set background if useCustomBackground is true
+    if (useCustomBackground) {
+      // Set the background color directly on the custom-bg elements for immediate effect
+      const customBgElements = document.querySelectorAll(".custom-bg");
+      customBgElements.forEach((el) => {
+        (el as HTMLElement).style.backgroundColor = customTheme;
+      });
+
+      // Also set the CSS variable for styled components
+      document.documentElement.style.setProperty(
+        "--background-custom",
+        customTheme
+      );
+    } else {
+      // Reset to default when custom background is disabled
+      const customBgElements = document.querySelectorAll(".custom-bg");
+      customBgElements.forEach((el) => {
+        (el as HTMLElement).style.backgroundColor = "";
+      });
+      document.documentElement.style.removeProperty("--background-custom");
+    }
+  }, [customTheme, useCustomBackground, theme]);
 
   return (
     <CustomThemeContext.Provider
       value={{
-        primaryColor,
-        setPrimaryColor,
-        secondaryColor,
-        setSecondaryColor,
-        accentColor,
-        setAccentColor,
+        customTheme,
+        setCustomTheme,
+        useCustomBackground,
+        setUseCustomBackground,
       }}
     >
       {children}

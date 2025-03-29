@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GraphTabsList, Tabs, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCheckIns } from "@/hooks/use-check-ins";
 import type {
@@ -183,7 +183,7 @@ export default function FieldSelectorGraph({
         className="w-full"
       >
         <div className="rounded-md border">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full">
+          <GraphTabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full">
             {Object.entries(fieldLabels).map(([field, label]) => (
               <TabsTrigger
                 key={field}
@@ -193,7 +193,7 @@ export default function FieldSelectorGraph({
                 {label}
               </TabsTrigger>
             ))}
-          </TabsList>
+          </GraphTabsList>
         </div>
       </Tabs>
 
