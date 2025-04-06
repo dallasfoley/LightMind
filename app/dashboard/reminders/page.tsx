@@ -93,6 +93,8 @@ export default async function RemindersPage() {
                           reminder={{
                             ...reminder,
                             completed: reminder.completed ?? false,
+                            notificationTime:
+                              reminder.notificationTime ?? undefined,
                           }}
                           userId={user?.id}
                         />

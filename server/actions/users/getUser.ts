@@ -22,6 +22,7 @@ export const getUser = cache(async (): Promise<UserType | null> => {
         const user = users[0];
         return {
           ...user,
+          enableNotifications: user.enableNotifications ?? false,
           journalStreak: user.journalStreak ?? 0,
         };
       } else {

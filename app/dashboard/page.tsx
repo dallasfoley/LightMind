@@ -27,12 +27,14 @@ export default async function DashboardPage() {
     dashboardData?.todaysReminders?.map((reminder) => ({
       ...reminder,
       completed: reminder.completed ?? false,
+      notificationTime: reminder.notificationTime ?? undefined,
     })) || [];
 
   const transformedUpcomingReminders =
     dashboardData?.upcomingReminders?.map((reminder) => ({
       ...reminder,
       completed: reminder.completed ?? false,
+      notificationTime: reminder.notificationTime ?? undefined,
     })) || [];
 
   const transformedDashboardData = dashboardData
