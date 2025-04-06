@@ -10,6 +10,8 @@ export const UserSchema = z.object({
   id: z.string(),
   clerkUserId: z.string(),
   journalStreak: z.number().default(0),
+  enableNotifications: z.boolean().default(false),
+  phoneNumber: z.string().nullable(),
 });
 
 export type UserType = z.infer<typeof UserSchema>;

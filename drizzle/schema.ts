@@ -13,6 +13,8 @@ export const UserTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   clerkUserId: text("clerkUserId").notNull().unique(),
   journalStreak: integer("journalStreak").default(0),
+  enableNotifications: boolean("enableNotifications").default(false),
+  phoneNumber: text("phoneNumber"),
 });
 
 export const CheckInTable = pgTable("checkIns", {
@@ -38,6 +40,7 @@ export const RemindersTable = pgTable("reminders", {
     .references(() => UserTable.id)
     .notNull(),
   completed: boolean("completed").default(false),
+  notificationTime: integer("notificationTime"),
 });
 
 export const JournalTable = pgTable("journals", {

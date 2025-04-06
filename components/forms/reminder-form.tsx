@@ -4,8 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +42,24 @@ interface ReminderFormProps {
 
 export default function ReminderForm({ userId }: ReminderFormProps) {
   const router = useRouter();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      try {
+        const response = await fetch("/api/user/settings");
+        if (response.ok) {
+          const data = await response.json();
+          setNotificationsEnabled(data.enableNotifications || false);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user settings:", error);
+      }
+    };
+
+    fetchUserSettings();
+  }, []);
+
   const form = useForm<z.infer<typeof ReminderFormSchema>>({
     resolver: zodResolver(ReminderFormSchema),
     defaultValues: {
@@ -48,6 +67,7 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
       description: "",
       datetime: new Date(),
       completed: false,
+      notificationTime: 30,
     },
   });
 
@@ -71,6 +91,16 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
       label: `${displayHour}:${minute} ${period}`,
     };
   });
+
+  // Notification time options
+  const notificationTimeOptions = [
+    { value: "5", label: "5 minutes before" },
+    { value: "15", label: "15 minutes before" },
+    { value: "30", label: "30 minutes before" },
+    { value: "60", label: "1 hour before" },
+    { value: "120", label: "2 hours before" },
+    { value: "1440", label: "1 day before" },
+  ];
 
   return (
     <Card className="max-w-2xl mx-auto p-4 text-black">
@@ -222,6 +252,42 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                 )}
               />
             </div>
+
+            {notificationsEnabled && (
+              <FormField
+                control={form.control}
+                name="notificationTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg font-semibold flex items-center gap-2">
+                      <Bell className="h-4 w-4" />
+                      Notification Timing
+                    </FormLabel>
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange(Number.parseInt(value))
+                      }
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="When to send notification" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {notificationTimeOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <Button
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"

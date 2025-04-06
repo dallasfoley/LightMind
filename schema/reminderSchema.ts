@@ -5,6 +5,7 @@ export const ReminderFormSchema = z.object({
   description: z.string().nullable(),
   datetime: z.date(),
   completed: z.boolean().default(false),
+  notificationTime: z.number().min(0).optional(),
 });
 
 export type ReminderFormType = z.infer<typeof ReminderFormSchema>;
