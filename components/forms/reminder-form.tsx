@@ -73,7 +73,18 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
 
   const handleSubmit = async (formData: z.infer<typeof ReminderFormSchema>) => {
     try {
-      await submitReminder(formData, userId);
+      // Create a new date object to ensure we're working with the user's local time
+      const localDatetime = new Date(formData.datetime);
+
+      // Submit the form with the local datetime
+      await submitReminder(
+        {
+          ...formData,
+          datetime: localDatetime,
+        },
+        userId
+      );
+
       router.replace("/dashboard/reminders");
     } catch (e) {
       console.error(e);
@@ -180,13 +191,15 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                           onSelect={(date) => {
                             if (date) {
                               const currentTime = field.value || new Date();
-                              date.setHours(
+                              // Create a new date to avoid timezone issues
+                              const newDate = new Date(date);
+                              newDate.setHours(
                                 currentTime.getHours(),
                                 currentTime.getMinutes(),
                                 0,
                                 0
                               );
-                              field.onChange(date);
+                              field.onChange(newDate);
                             }
                           }}
                           disabled={(date) => {
@@ -215,10 +228,13 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                     <Select
                       onValueChange={(time) => {
                         const [hours, minutes] = time.split(":").map(Number);
-                        const date = field.value || new Date();
-                        date.setHours(hours);
-                        date.setMinutes(minutes);
-                        field.onChange(date);
+                        // Create a new date to avoid timezone issues
+                        const newDate = new Date(field.value || new Date());
+                        newDate.setHours(hours);
+                        newDate.setMinutes(minutes);
+                        newDate.setSeconds(0);
+                        newDate.setMilliseconds(0);
+                        field.onChange(newDate);
                       }}
                       value={
                         field.value
