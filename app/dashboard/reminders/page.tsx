@@ -26,11 +26,18 @@ export default async function RemindersPage() {
         .where(eq(RemindersTable.userId, user?.id))
     : [];
 
-  const reminders = unSortedReminders.sort((a, b) => {
-    if (a.completed && !b.completed) return 1;
-    if (!a.completed && b.completed) return -1;
-    return a.datetime.getTime() - b.datetime.getTime();
-  });
+  // Ensure dates are properly handled
+  const reminders = unSortedReminders
+    .map((reminder) => ({
+      ...reminder,
+      // Ensure datetime is a proper Date object
+      datetime: new Date(reminder.datetime),
+    }))
+    .sort((a, b) => {
+      if (a.completed && !b.completed) return 1;
+      if (!a.completed && b.completed) return -1;
+      return a.datetime.getTime() - b.datetime.getTime();
+    });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,12 +77,8 @@ export default async function RemindersPage() {
                   <TableRow key={reminder.id}>
                     <TableCell>{reminder.title}</TableCell>
                     <TableCell>{reminder.description}</TableCell>
-                    <TableCell>
-                      {format(new Date(reminder.datetime), "PPP")}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(reminder.datetime), "p")}
-                    </TableCell>
+                    <TableCell>{format(reminder.datetime, "PPP")}</TableCell>
+                    <TableCell>{format(reminder.datetime, "p")}</TableCell>
                     <TableCell>
                       <span
                         className={`font-medium ${
