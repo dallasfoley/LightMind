@@ -15,6 +15,7 @@ import {
   daysAgoString,
   startOfToday,
   endOfToday,
+  isToday,
 } from "@/lib/date-utils";
 
 export async function getDashboardData(user: UserType) {
@@ -93,7 +94,7 @@ export async function getDashboardData(user: UserType) {
         )
         .limit(1),
 
-      // Today's and upcoming reminders
+      // All upcoming reminders (we'll filter for today later)
       db
         .select()
         .from(RemindersTable)
@@ -123,22 +124,33 @@ export async function getDashboardData(user: UserType) {
         ),
     ]);
 
-    // Process reminders to separate today's from upcoming
+    // Log all reminders for debugging
+    console.log(
+      "All reminders:",
+      remindersResult.map((r) => ({
+        title: r.title,
+        datetime: new Date(r.datetime).toISOString(),
+        completed: r.completed,
+      }))
+    );
+
+    // Process reminders to separate today's from upcoming with more explicit checks
     const todaysReminders = remindersResult.filter((reminder) => {
-      const reminderDate = new Date(reminder.datetime);
-      return (
-        reminderDate >= todayStart &&
-        reminderDate <= todayEnd &&
-        !reminder.completed
-      );
+      // Check if the reminder is for today using our utility function
+      return isToday(reminder.datetime) && !reminder.completed;
     });
 
     const upcomingReminders = remindersResult
-      .filter(
-        (reminder) =>
-          new Date(reminder.datetime) > todayEnd && !reminder.completed
-      )
+      .filter((reminder) => {
+        const reminderDate = new Date(reminder.datetime);
+        // Check if the reminder is after today
+        return reminderDate > todayEnd && !reminder.completed;
+      })
       .slice(0, 5); // Limit to 5 upcoming reminders
+
+    // Log filtered reminders for debugging
+    console.log("Today's reminders:", todaysReminders.length);
+    console.log("Upcoming reminders:", upcomingReminders.length);
 
     // Process check-ins to add proper Date objects
     const processedCheckIns = recentCheckInsResult.map((checkIn) => {

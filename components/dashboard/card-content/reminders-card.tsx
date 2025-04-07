@@ -1,5 +1,6 @@
-import { ReminderType } from "@/schema/reminderSchema";
+import type { ReminderType } from "@/schema/reminderSchema";
 import type { UserType } from "@/schema/userSchema";
+import { utcToLocal, isToday } from "@/lib/date-utils";
 
 export default async function RemindersCard({
   user,
@@ -8,36 +9,56 @@ export default async function RemindersCard({
   user: UserType;
   reminders: ReminderType[];
 }) {
-  console.log("reminders: ", reminders);
-  if (!user || !reminders)
+  console.log(
+    "reminders before filtering:",
+    reminders.map((r) => ({
+      title: r.title,
+      datetime: new Date(r.datetime).toISOString(),
+      isToday: isToday(r.datetime),
+    }))
+  );
+
+  // Filter to ensure we only show today's reminders
+  const todaysReminders = reminders.filter((reminder) =>
+    isToday(reminder.datetime)
+  );
+
+  console.log("reminders after filtering:", todaysReminders.length);
+
+  if (!user)
     return <p className="text-red-500 text-center">Error loading reminders</p>;
 
   return (
     <div className="w-full h-full flex flex-col">
-      {reminders.length > 0 ? (
+      {todaysReminders.length > 0 ? (
         <>
           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
             Today&apos;s Reminders
           </h2>
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent">
             <ul className="space-y-1 pr-1">
-              {reminders.map((reminder, index) => (
-                <li
-                  key={index}
-                  className="p-2 flex items-center justify-between rounded-md bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700"
-                >
-                  <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {reminder.title}
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                    {new Date(reminder.datetime).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    })}
-                  </p>
-                </li>
-              ))}
+              {todaysReminders.map((reminder, index) => {
+                // Convert to local time for display
+                const localTime = utcToLocal(reminder.datetime);
+
+                return (
+                  <li
+                    key={index}
+                    className="p-2 flex items-center justify-between rounded-md bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700"
+                  >
+                    <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {reminder.title}
+                    </p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                      {localTime.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </p>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </>
