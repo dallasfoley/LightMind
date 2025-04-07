@@ -13,9 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
 import ReminderSwitch from "@/components/reminders/reminder-switch";
 import DeleteReminderButton from "@/components/reminders/delete-reminder-button";
+import { formatDate } from "@/lib/date-utils";
 
 export default async function RemindersPage() {
   const user = await getUser();
@@ -26,13 +26,18 @@ export default async function RemindersPage() {
         .where(eq(RemindersTable.userId, user?.id))
     : [];
 
-  // Ensure dates are properly handled
+  // Ensure dates are properly handled with explicit timezone conversion
   const reminders = unSortedReminders
-    .map((reminder) => ({
-      ...reminder,
-      // Ensure datetime is a proper Date object
-      datetime: new Date(reminder.datetime),
-    }))
+    .map((reminder) => {
+      // Convert the database UTC time to a Date object
+      const utcDate = new Date(reminder.datetime);
+
+      // No need to adjust here - format() will handle local display
+      return {
+        ...reminder,
+        datetime: utcDate,
+      };
+    })
     .sort((a, b) => {
       if (a.completed && !b.completed) return 1;
       if (!a.completed && b.completed) return -1;
@@ -77,8 +82,10 @@ export default async function RemindersPage() {
                   <TableRow key={reminder.id}>
                     <TableCell>{reminder.title}</TableCell>
                     <TableCell>{reminder.description}</TableCell>
-                    <TableCell>{format(reminder.datetime, "PPP")}</TableCell>
-                    <TableCell>{format(reminder.datetime, "p")}</TableCell>
+                    <TableCell>
+                      {formatDate(reminder.datetime, "PPP")}
+                    </TableCell>
+                    <TableCell>{formatDate(reminder.datetime, "p")}</TableCell>
                     <TableCell>
                       <span
                         className={`font-medium ${
