@@ -6,6 +6,7 @@ import {
 } from "@/schema/checkInSchema";
 import { db } from "@/lib/db";
 import { CheckInTable } from "@/drizzle/schema";
+import { revalidatePath } from "next/cache";
 
 export async function submitCheckIn(
   formData: CheckInFormDataType,
@@ -38,6 +39,7 @@ export async function submitCheckIn(
     await db
       .insert(CheckInTable)
       .values({ ...data, date: formattedDate, userId });
+    revalidatePath("/dashboard");
 
     return { success: true };
   } catch (dbError) {
