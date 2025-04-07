@@ -6,6 +6,7 @@ import { getDashboardData } from "@/server/actions/getDashboardData";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatbotLink } from "@/components/dashboard/chatbot-link";
+import { utcToLocal } from "@/lib/date-utils";
 
 export const metadata = {
   title: "Dashboard | LightMind",
@@ -20,12 +21,16 @@ export default async function DashboardPage() {
   const transformedCheckIns =
     dashboardData?.recentCheckIns?.map((checkIn) => ({
       ...checkIn,
-      date: new Date(checkIn.date),
+      // Ensure date is a proper Date object in local timezone
+      date:
+        checkIn.date instanceof Date ? checkIn.date : new Date(checkIn.date),
     })) || [];
 
   const transformedTodayReminders =
     dashboardData?.todaysReminders?.map((reminder) => ({
       ...reminder,
+      // Convert datetime to local timezone
+      datetime: utcToLocal(reminder.datetime),
       completed: reminder.completed ?? false,
       notificationTime: reminder.notificationTime ?? undefined,
     })) || [];
@@ -33,6 +38,8 @@ export default async function DashboardPage() {
   const transformedUpcomingReminders =
     dashboardData?.upcomingReminders?.map((reminder) => ({
       ...reminder,
+      // Convert datetime to local timezone
+      datetime: utcToLocal(reminder.datetime),
       completed: reminder.completed ?? false,
       notificationTime: reminder.notificationTime ?? undefined,
     })) || [];

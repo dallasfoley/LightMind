@@ -8,8 +8,14 @@ import {
   UserTable,
 } from "@/drizzle/schema";
 import { eq, and, gte, asc } from "drizzle-orm";
-import { format, startOfDay, endOfDay, subDays } from "date-fns";
 import type { UserType } from "@/schema/userSchema";
+import {
+  getTodayString,
+  getYesterdayString,
+  daysAgoString,
+  startOfToday,
+  endOfToday,
+} from "@/lib/date-utils";
 
 export async function getDashboardData(user: UserType) {
   if (!user) {
@@ -26,15 +32,21 @@ export async function getDashboardData(user: UserType) {
   }
 
   try {
-    const now = new Date();
-    const todayStart = startOfDay(now);
-    const todayEnd = endOfDay(now);
-    const sevenDaysAgo = subDays(now, 7);
+    // Use the user's local timezone for date calculations
+    const todayStart = startOfToday();
+    const todayEnd = endOfToday();
+    const todayString = getTodayString();
+    const yesterdayString = getYesterdayString();
+    const sevenDaysAgoString = daysAgoString(7);
 
-    // For journal streak calculation
-    const yesterday = subDays(now, 1);
-    const yesterdayString = format(yesterday, "yyyy-MM-dd");
-    const todayString = format(now, "yyyy-MM-dd");
+    console.log("Date debug:", {
+      todayString,
+      yesterdayString,
+      sevenDaysAgoString,
+      todayStart: todayStart.toISOString(),
+      todayEnd: todayEnd.toISOString(),
+      serverNow: new Date().toISOString(),
+    });
 
     // Execute all queries in parallel
     const [
@@ -63,7 +75,7 @@ export async function getDashboardData(user: UserType) {
         .where(
           and(
             eq(CheckInTable.userId, user.id),
-            gte(CheckInTable.date, format(sevenDaysAgo, "yyyy-MM-dd"))
+            gte(CheckInTable.date, sevenDaysAgoString)
           )
         )
         .orderBy(asc(CheckInTable.date))
@@ -166,6 +178,7 @@ export async function getDashboardData(user: UserType) {
       checkedInToday: todaysCheckInResult.length > 0,
       journalStreak: hasJournaledRecently ? journalStreak : 0,
       todaysRemindersCount: todaysReminders.length,
+      upcomingRemindersCount: upcomingReminders.length,
       recentCheckInsCount: processedCheckIns.length,
     });
 
