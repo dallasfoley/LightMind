@@ -6,7 +6,7 @@ import { getDashboardData } from "@/server/actions/getDashboardData";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatbotLink } from "@/components/dashboard/chatbot-link";
-import { utcToLocal } from "@/lib/date-utils";
+import { utcToLocal, isToday } from "@/lib/date-utils";
 
 export const metadata = {
   title: "Dashboard | LightMind",
@@ -18,6 +18,13 @@ export default async function DashboardPage() {
 
   const dashboardData = user ? await getDashboardData(user) : null;
 
+  // Log the raw data for debugging
+  console.log("Raw dashboard data:", {
+    checkedInToday: dashboardData?.checkedInToday,
+    todaysRemindersCount: dashboardData?.todaysReminders?.length,
+    upcomingRemindersCount: dashboardData?.upcomingReminders?.length,
+  });
+
   const transformedCheckIns =
     dashboardData?.recentCheckIns?.map((checkIn) => ({
       ...checkIn,
@@ -26,8 +33,14 @@ export default async function DashboardPage() {
         checkIn.date instanceof Date ? checkIn.date : new Date(checkIn.date),
     })) || [];
 
+  // Filter today's reminders again on the client side to be sure
+  const todaysReminders =
+    dashboardData?.todaysReminders?.filter((reminder) =>
+      isToday(reminder.datetime)
+    ) || [];
+
   const transformedTodayReminders =
-    dashboardData?.todaysReminders?.map((reminder) => ({
+    todaysReminders.map((reminder) => ({
       ...reminder,
       // Convert datetime to local timezone
       datetime: utcToLocal(reminder.datetime),
@@ -59,6 +72,12 @@ export default async function DashboardPage() {
           : null,
       }
     : null;
+
+  // Log the transformed data for debugging
+  console.log("Transformed dashboard data:", {
+    todaysRemindersCount: transformedDashboardData?.todaysReminders?.length,
+    upcomingRemindersCount: transformedDashboardData?.upcomingReminders?.length,
+  });
 
   return (
     <div className="space-y-4">

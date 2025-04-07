@@ -1,4 +1,6 @@
-import { format as dateFnsFormat } from "date-fns";
+/**
+ * Date utility functions that handle timezone correctly
+ */
 
 /**
  * Converts a UTC date from the database to local time for display
@@ -23,7 +25,28 @@ export function utcToLocal(date: Date | string): Date {
  */
 export function formatDate(date: Date | string, formatStr: string): string {
   const localDate = utcToLocal(date);
-  return dateFnsFormat(localDate, formatStr);
+
+  // Simple format implementation for common patterns
+  if (formatStr === "PPP") {
+    // Full date: e.g., April 1, 2023
+    return localDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  if (formatStr === "p") {
+    // Time: e.g., 12:00 PM
+    return localDate.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
+
+  // Default to ISO string if format not recognized
+  return localDate.toISOString();
 }
 
 /**
@@ -31,10 +54,7 @@ export function formatDate(date: Date | string, formatStr: string): string {
  */
 export function getTodayString(): string {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return formatDateToYYYYMMDD(now);
 }
 
 /**
@@ -43,10 +63,7 @@ export function getTodayString(): string {
 export function getYesterdayString(): string {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  const year = yesterday.getFullYear();
-  const month = String(yesterday.getMonth() + 1).padStart(2, "0");
-  const day = String(yesterday.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return formatDateToYYYYMMDD(yesterday);
 }
 
 /**
@@ -54,7 +71,9 @@ export function getYesterdayString(): string {
  */
 export function startOfToday(): Date {
   const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const result = new Date(now);
+  result.setHours(0, 0, 0, 0);
+  return result;
 }
 
 /**
@@ -62,15 +81,9 @@ export function startOfToday(): Date {
  */
 export function endOfToday(): Date {
   const now = new Date();
-  return new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    23,
-    59,
-    59,
-    999
-  );
+  const result = new Date(now);
+  result.setHours(23, 59, 59, 999);
+  return result;
 }
 
 /**
@@ -86,9 +99,29 @@ export function daysAgo(days: number): Date {
  * Formats a date N days ago as a YYYY-MM-DD string
  */
 export function daysAgoString(days: number): string {
-  const daysAgoDate = daysAgo(days);
-  const year = daysAgoDate.getFullYear();
-  const month = String(daysAgoDate.getMonth() + 1).padStart(2, "0");
-  const day = String(daysAgoDate.getDate()).padStart(2, "0");
+  return formatDateToYYYYMMDD(daysAgo(days));
+}
+
+/**
+ * Helper function to format a date as YYYY-MM-DD
+ */
+function formatDateToYYYYMMDD(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Determines if a date is today in the user's timezone
+ */
+export function isToday(date: Date | string): boolean {
+  const checkDate = typeof date === "string" ? new Date(date) : new Date(date);
+  const today = new Date();
+
+  return (
+    checkDate.getDate() === today.getDate() &&
+    checkDate.getMonth() === today.getMonth() &&
+    checkDate.getFullYear() === today.getFullYear()
+  );
 }
