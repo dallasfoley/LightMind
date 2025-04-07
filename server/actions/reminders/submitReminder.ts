@@ -21,14 +21,9 @@ export async function submitReminder(
       return { success: false, error: "Unauthorized" };
     }
 
-    // Create a new date object with the UTC time
-    // This ensures the time is stored correctly regardless of the server's timezone
-    const utcDatetime = new Date(data.datetime);
-
-    // Store the date in ISO format to preserve the exact time
+    // Store the date exactly as received - the client has already adjusted it
     await db.insert(RemindersTable).values({
       ...data,
-      datetime: utcDatetime,
       userId,
     });
 

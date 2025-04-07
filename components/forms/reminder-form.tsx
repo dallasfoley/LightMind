@@ -73,14 +73,26 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
 
   const handleSubmit = async (formData: z.infer<typeof ReminderFormSchema>) => {
     try {
-      // Create a new date object to ensure we're working with the user's local time
+      // Get the user's timezone offset in minutes
+      const timezoneOffset = new Date().getTimezoneOffset();
+
+      // Create a new date object from the form data
       const localDatetime = new Date(formData.datetime);
 
-      // Submit the form with the local datetime
+      // Adjust for the timezone offset to ensure the date is stored as intended
+      // This explicitly converts the local time to UTC while preserving the intended time
+      const adjustedDatetime = new Date(
+        localDatetime.getTime() - timezoneOffset * 60000
+      );
+
+      console.log("Original datetime:", localDatetime.toISOString());
+      console.log("Adjusted datetime:", adjustedDatetime.toISOString());
+
+      // Submit with the adjusted datetime
       await submitReminder(
         {
           ...formData,
-          datetime: localDatetime,
+          datetime: adjustedDatetime,
         },
         userId
       );
