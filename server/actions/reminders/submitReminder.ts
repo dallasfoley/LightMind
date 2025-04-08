@@ -21,6 +21,9 @@ export async function submitReminder(
       return { success: false, error: "Unauthorized" };
     }
 
+    // Log the incoming date for debugging
+    console.log("Server received datetime:", data.datetime.toISOString());
+
     // Store the date exactly as received - the client has already adjusted it
     await db.insert(RemindersTable).values({
       ...data,

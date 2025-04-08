@@ -8,7 +8,6 @@ import ChatButton from "@/components/chat/chat-button";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarProvider } from "@/components/dashboard/sidebar-provider";
-import TimezoneScript from "@/components/timezone-script";
 
 const DynamicHeader = dynamic(() => import("@/components/dashboard/header"), {
   loading: () => <Skeleton style={{ height: 60 }} />,
@@ -39,7 +38,6 @@ export default async function DashboardLayout({
             <div className="flex flex-col flex-1 overflow-hidden bg-zinc-100 dark:bg-zinc-900 custom-bg">
               <DynamicHeader />
               <main className="flex-1 overflow-x-hidden overflow-y-auto">
-                <TimezoneScript />
                 <div className="container mx-auto px-6 py-8">{children}</div>
               </main>
               <ChatButton />

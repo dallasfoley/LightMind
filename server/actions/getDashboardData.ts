@@ -15,10 +15,24 @@ import {
   daysAgoString,
   startOfToday,
   endOfToday,
-  isToday,
 } from "@/lib/date-utils";
+import type { ReminderType } from "@/schema/reminderSchema";
 
-export async function getDashboardData(user: UserType) {
+// Define the return type for the dashboard data
+interface DashboardData {
+  todaysCheckIn: any | null;
+  recentCheckIns: any[];
+  todaysJournal: any | null;
+  todaysReminders: ReminderType[];
+  upcomingReminders: ReminderType[];
+  checkedInToday: boolean;
+  journalStreak: number;
+  hasJournaledRecently: boolean;
+}
+
+export async function getDashboardData(
+  user: UserType
+): Promise<DashboardData | null> {
   if (!user) {
     return {
       todaysCheckIn: null,
@@ -94,16 +108,11 @@ export async function getDashboardData(user: UserType) {
         )
         .limit(1),
 
-      // All upcoming reminders (we'll filter for today later)
+      // All reminders - we'll filter for today later
       db
         .select()
         .from(RemindersTable)
-        .where(
-          and(
-            eq(RemindersTable.userId, user.id),
-            gte(RemindersTable.datetime, todayStart)
-          )
-        )
+        .where(eq(RemindersTable.userId, user.id))
         .orderBy(RemindersTable.datetime),
 
       // Get user data for journal streak
@@ -134,23 +143,15 @@ export async function getDashboardData(user: UserType) {
       }))
     );
 
-    // Process reminders to separate today's from upcoming with more explicit checks
-    const todaysReminders = remindersResult.filter((reminder) => {
-      // Check if the reminder is for today using our utility function
-      return isToday(reminder.datetime) && !reminder.completed;
-    });
-
-    const upcomingReminders = remindersResult
-      .filter((reminder) => {
-        const reminderDate = new Date(reminder.datetime);
-        // Check if the reminder is after today
-        return reminderDate > todayEnd && !reminder.completed;
-      })
-      .slice(0, 5); // Limit to 5 upcoming reminders
-
-    // Log filtered reminders for debugging
-    console.log("Today's reminders:", todaysReminders.length);
-    console.log("Upcoming reminders:", upcomingReminders.length);
+    // Process reminders to separate today's from upcoming
+    // For production with different server timezone, we'll send ALL reminders to the client
+    // and let the client filter them based on the user's local timezone
+    const allReminders = remindersResult.map((reminder) => ({
+      ...reminder,
+      datetime: new Date(reminder.datetime),
+      completed: reminder.completed === null ? false : reminder.completed,
+      notificationTime: reminder.notificationTime ?? undefined,
+    }));
 
     // Process check-ins to add proper Date objects
     const processedCheckIns = recentCheckInsResult.map((checkIn) => {
@@ -189,8 +190,7 @@ export async function getDashboardData(user: UserType) {
     console.log("Dashboard data fetched:", {
       checkedInToday: todaysCheckInResult.length > 0,
       journalStreak: hasJournaledRecently ? journalStreak : 0,
-      todaysRemindersCount: todaysReminders.length,
-      upcomingRemindersCount: upcomingReminders.length,
+      remindersCount: allReminders.length,
       recentCheckInsCount: processedCheckIns.length,
     });
 
@@ -198,8 +198,8 @@ export async function getDashboardData(user: UserType) {
       todaysCheckIn: todaysCheckInResult[0] || null,
       recentCheckIns: processedCheckIns,
       todaysJournal: todaysJournalResult[0] || null,
-      todaysReminders,
-      upcomingReminders,
+      todaysReminders: allReminders, // Send all reminders to client
+      upcomingReminders: [], // Let client filter these
       checkedInToday: todaysCheckInResult.length > 0,
       journalStreak: hasJournaledRecently ? journalStreak : 0,
       hasJournaledRecently,

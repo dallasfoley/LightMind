@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { z } from "zod";
+import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -33,16 +33,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReminderFormSchema } from "@/schema/reminderSchema";
-import { submitReminder } from "@/server/actions/reminders/submitReminder";
+import TimezoneDebug from "@/components/timezone-debug";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { createReminderWithDateString } from "@/server/actions/reminders/createReminderWithDateString";
+
+// Define a new schema that uses string for datetime
+const ReminderFormSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  date: z.date(),
+  time: z.string(),
+  completed: z.boolean().default(false),
+  notificationTime: z.number().min(0).optional(),
+});
+
+type ReminderFormValues = z.infer<typeof ReminderFormSchema>;
 
 interface ReminderFormProps {
   userId: string;
 }
 
-export default function ReminderForm({ userId }: ReminderFormProps) {
+export default function ReminderFormNew({ userId }: ReminderFormProps) {
   const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserSettings = async () => {
@@ -60,56 +76,87 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
     fetchUserSettings();
   }, []);
 
-  const form = useForm<z.infer<typeof ReminderFormSchema>>({
+  const form = useForm<ReminderFormValues>({
     resolver: zodResolver(ReminderFormSchema),
     defaultValues: {
       title: "",
       description: "",
-      datetime: new Date(),
+      date: new Date(),
+      time: "12:00",
       completed: false,
       notificationTime: 30,
     },
   });
 
-  const handleSubmit = async (formData: z.infer<typeof ReminderFormSchema>) => {
+  const handleSubmit = async (formData: ReminderFormValues) => {
     try {
-      // Get the local date from the form
-      const localDate = new Date(formData.datetime);
+      setIsSubmitting(true);
+      setError(null);
 
-      // Store the local time components
-      const year = localDate.getFullYear();
-      const month = localDate.getMonth();
-      const day = localDate.getDate();
-      const hours = localDate.getHours();
-      const minutes = localDate.getMinutes();
-      const seconds = localDate.getSeconds();
+      // Extract date components
+      const year = formData.date.getFullYear();
+      const month = formData.date.getMonth() + 1; // Month is 0-indexed
+      const day = formData.date.getDate();
 
-      // Create a new date object with the local time components
-      // but in UTC (this effectively preserves the local time)
-      const utcDate = new Date();
-      utcDate.setUTCFullYear(year);
-      utcDate.setUTCMonth(month);
-      utcDate.setUTCDate(day);
-      utcDate.setUTCHours(hours);
-      utcDate.setUTCMinutes(minutes);
-      utcDate.setUTCSeconds(seconds);
-      utcDate.setUTCMilliseconds(0);
+      // Extract time components
+      const [hours, minutes] = formData.time.split(":").map(Number);
 
-      console.log("Local date (user selected):", localDate.toString());
-      console.log("UTC date (to be stored):", utcDate.toISOString());
+      // Create a date string in YYYY-MM-DD HH:MM:SS format
+      // This format has no timezone information
+      const dateString = `${year}-${String(month).padStart(2, "0")}-${String(
+        day
+      ).padStart(2, "0")} ${String(hours).padStart(2, "0")}:${String(
+        minutes
+      ).padStart(2, "0")}:00`;
 
-      // Submit the reminder with the UTC date
-      await submitReminder(
-        {
-          ...formData,
-          datetime: utcDate,
+      console.log("Submitting reminder with date string:", dateString);
+
+      // Try using the server action first
+      const result = await createReminderWithDateString({
+        title: formData.title,
+        description: formData.description || "",
+        dateString: dateString,
+        completed: formData.completed,
+        notificationTime: formData.notificationTime,
+      });
+
+      if (result.success) {
+        router.replace("/dashboard/reminders");
+        return;
+      }
+
+      // If server action fails, try the API route
+      console.log("Server action failed, trying API route");
+      const response = await fetch("/api/reminders/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        userId
-      );
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description || "",
+          dateString: dateString,
+          completed: formData.completed,
+          notificationTime: formData.notificationTime,
+          userId: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server error: ${response.status}`);
+      }
 
       router.replace("/dashboard/reminders");
     } catch (e) {
       console.error(e);
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Failed to create reminder. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -141,6 +188,17 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
         <CardTitle className="text-xl text-center">New Reminder</CardTitle>
       </CardHeader>
       <CardContent>
+        <TimezoneDebug />
+        <div className="my-4" />
+
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
@@ -182,7 +240,7 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
             <div className="flex flex-col md:flex-row gap-4">
               <FormField
                 control={form.control}
-                name="datetime"
+                name="date"
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel className="text-lg font-semibold">
@@ -210,20 +268,7 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
                         <Calendar
                           mode="single"
                           selected={field.value}
-                          onSelect={(date) => {
-                            if (date) {
-                              const currentTime = field.value || new Date();
-                              // Create a new date to avoid timezone issues
-                              const newDate = new Date(date);
-                              newDate.setHours(
-                                currentTime.getHours(),
-                                currentTime.getMinutes(),
-                                0,
-                                0
-                              );
-                              field.onChange(newDate);
-                            }
-                          }}
+                          onSelect={(date) => date && field.onChange(date)}
                           disabled={(date) => {
                             const today = new Date();
                             today.setHours(0, 0, 0, 0);
@@ -241,40 +286,16 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
               />
               <FormField
                 control={form.control}
-                name="datetime"
+                name="time"
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel className="text-lg font-semibold">
                       Time
                     </FormLabel>
-                    <Select
-                      onValueChange={(time) => {
-                        const [hours, minutes] = time.split(":").map(Number);
-                        // Create a new date to avoid timezone issues
-                        const newDate = new Date(field.value || new Date());
-                        newDate.setHours(hours);
-                        newDate.setMinutes(minutes);
-                        newDate.setSeconds(0);
-                        newDate.setMilliseconds(0);
-                        field.onChange(newDate);
-                      }}
-                      value={
-                        field.value
-                          ? format(new Date(field.value), "HH:mm")
-                          : undefined
-                      }
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                          <SelectValue placeholder="Select time">
-                            {field.value ? (
-                              format(new Date(field.value), "h:mm a")
-                            ) : (
-                              <span className="text-muted-foreground">
-                                Select time
-                              </span>
-                            )}
-                          </SelectValue>
+                          <SelectValue placeholder="Select time" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -329,8 +350,9 @@ export default function ReminderForm({ userId }: ReminderFormProps) {
             <Button
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              disabled={isSubmitting}
             >
-              Create Reminder
+              {isSubmitting ? "Creating..." : "Create Reminder"}
             </Button>
           </form>
         </Form>

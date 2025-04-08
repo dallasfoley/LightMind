@@ -3,53 +3,6 @@
  */
 
 /**
- * Converts a UTC date from the database to local time for display
- */
-export function utcToLocal(date: Date | string): Date {
-  const utcDate = typeof date === "string" ? new Date(date) : new Date(date);
-
-  // Get the UTC time values
-  const utcYear = utcDate.getUTCFullYear();
-  const utcMonth = utcDate.getUTCMonth();
-  const utcDay = utcDate.getUTCDate();
-  const utcHours = utcDate.getUTCHours();
-  const utcMinutes = utcDate.getUTCMinutes();
-  const utcSeconds = utcDate.getUTCSeconds();
-
-  // Create a new date using local timezone with the UTC values
-  return new Date(utcYear, utcMonth, utcDay, utcHours, utcMinutes, utcSeconds);
-}
-
-/**
- * Formats a date for display, ensuring correct timezone handling
- */
-export function formatDate(date: Date | string, formatStr: string): string {
-  const localDate = utcToLocal(date);
-
-  // Simple format implementation for common patterns
-  if (formatStr === "PPP") {
-    // Full date: e.g., April 1, 2023
-    return localDate.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
-
-  if (formatStr === "p") {
-    // Time: e.g., 12:00 PM
-    return localDate.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  }
-
-  // Default to ISO string if format not recognized
-  return localDate.toISOString();
-}
-
-/**
  * Gets the current date in the user's timezone as a YYYY-MM-DD string
  */
 export function getTodayString(): string {
@@ -114,14 +67,57 @@ function formatDateToYYYYMMDD(date: Date): string {
 
 /**
  * Determines if a date is today in the user's timezone
+ * This is the critical function for filtering today's reminders
  */
 export function isToday(date: Date | string): boolean {
+  // Convert to Date object if it's a string
   const checkDate = typeof date === "string" ? new Date(date) : new Date(date);
+
+  // Get today's date
   const today = new Date();
 
+  // Compare only the date parts (year, month, day)
   return (
-    checkDate.getDate() === today.getDate() &&
+    checkDate.getFullYear() === today.getFullYear() &&
     checkDate.getMonth() === today.getMonth() &&
-    checkDate.getFullYear() === today.getFullYear()
+    checkDate.getDate() === today.getDate()
   );
+}
+
+/**
+ * Formats a date for display, ensuring correct timezone handling
+ */
+export function formatDate(date: Date | string, formatStr: string): string {
+  const localDate = typeof date === "string" ? new Date(date) : new Date(date);
+
+  // Simple format implementation for common patterns
+  if (formatStr === "PPP") {
+    // Full date: e.g., April 1, 2023
+    return localDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  if (formatStr === "p") {
+    // Time: e.g., 12:00 PM
+    return localDate.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
+
+  // Default to ISO string if format not recognized
+  return localDate.toISOString();
+}
+
+/**
+ * Converts a UTC date to a date string in the format YYYY-MM-DD
+ * This is useful for database queries that need to match dates
+ */
+export function getDateStringFromUTC(utcDate: Date | string): string {
+  const date = typeof utcDate === "string" ? new Date(utcDate) : utcDate;
+  return date.toISOString().split("T")[0];
 }

@@ -1,48 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { RemindersTable } from "@/drizzle/schema";
-import { db } from "@/lib/db";
 import { getUser } from "@/server/actions/users/getUser";
-import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import ReminderSwitch from "@/components/reminders/reminder-switch";
-import DeleteReminderButton from "@/components/reminders/delete-reminder-button";
-import { formatDate } from "@/lib/date-utils";
+import RemindersDisplay from "@/components/reminders/reminders-display";
+import { redirect } from "next/navigation";
 
 export default async function RemindersPage() {
   const user = await getUser();
-  const unSortedReminders = user
-    ? await db
-        .select()
-        .from(RemindersTable)
-        .where(eq(RemindersTable.userId, user?.id))
-    : [];
 
-  // Ensure dates are properly handled with explicit timezone conversion
-  const reminders = unSortedReminders
-    .map((reminder) => {
-      // Convert the database UTC time to a Date object
-      const utcDate = new Date(reminder.datetime);
-
-      // No need to adjust here - format() will handle local display
-      return {
-        ...reminder,
-        datetime: utcDate,
-      };
-    })
-    .sort((a, b) => {
-      if (a.completed && !b.completed) return 1;
-      if (!a.completed && b.completed) return -1;
-      return a.datetime.getTime() - b.datetime.getTime();
-    });
+  if (!user) {
+    redirect("/login");
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -64,64 +32,7 @@ export default async function RemindersPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {reminders.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Due Time</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Completed?</TableHead>
-                  <TableHead>Delete</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {reminders.map((reminder) => (
-                  <TableRow key={reminder.id}>
-                    <TableCell>{reminder.title}</TableCell>
-                    <TableCell>{reminder.description}</TableCell>
-                    <TableCell>
-                      {formatDate(reminder.datetime, "PPP")}
-                    </TableCell>
-                    <TableCell>{formatDate(reminder.datetime, "p")}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`font-medium ${
-                          reminder.completed
-                            ? "text-green-600"
-                            : "text-amber-600"
-                        }`}
-                      >
-                        {reminder.completed ? "Completed" : "Pending"}
-                      </span>
-                    </TableCell>
-                    {user && (
-                      <TableCell>
-                        <ReminderSwitch
-                          reminder={{
-                            ...reminder,
-                            completed: reminder.completed ?? false,
-                            notificationTime:
-                              reminder.notificationTime ?? undefined,
-                          }}
-                          userId={user?.id}
-                        />
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <DeleteReminderButton reminderId={reminder.id} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <p className="text-center py-4">
-              No reminders found. Create a new one to get started!
-            </p>
-          )}
+          <RemindersDisplay userId={user.id} />
         </CardContent>
       </Card>
     </div>
