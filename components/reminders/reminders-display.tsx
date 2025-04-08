@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import ReminderSwitch from "@/components/reminders/reminder-switch";
 import DeleteReminderButton from "@/components/reminders/delete-reminder-button";
-import TimezoneDebug from "@/components/timezone-debug";
 
 type Reminder = {
   id: string;
@@ -71,6 +70,7 @@ export default function RemindersDisplay({ userId }: { userId: string }) {
       const date = new Date(dateString);
       return date.toLocaleDateString();
     } catch (error) {
+      console.error("Error formatting time:", error);
       return "Invalid date";
     }
   };
@@ -85,6 +85,7 @@ export default function RemindersDisplay({ userId }: { userId: string }) {
         minute: "2-digit",
       });
     } catch (error) {
+      console.error("Error formatting time:", error);
       return "Invalid time";
     }
   };
@@ -97,7 +98,6 @@ export default function RemindersDisplay({ userId }: { userId: string }) {
     return (
       <div className="text-center py-4">
         <p className="text-red-500">Error: {error}</p>
-        <TimezoneDebug />
       </div>
     );
   }
@@ -108,14 +108,12 @@ export default function RemindersDisplay({ userId }: { userId: string }) {
         <p className="text-center py-4">
           No reminders found. Create a new one to get started!
         </p>
-        <TimezoneDebug />
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <TimezoneDebug />
       <Table>
         <TableHeader>
           <TableRow>
