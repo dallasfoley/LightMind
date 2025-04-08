@@ -36,7 +36,7 @@ export default async function DashboardPage() {
   const transformedTodayReminders = Array.isArray(
     dashboardData?.todaysReminders
   )
-    ? dashboardData.todaysReminders.map((reminder: any) => ({
+    ? dashboardData.todaysReminders.map((reminder) => ({
         ...reminder,
         // Convert datetime to Date object
         datetime: new Date(reminder.datetime),
@@ -51,7 +51,7 @@ export default async function DashboardPage() {
   const transformedUpcomingReminders = Array.isArray(
     dashboardData?.upcomingReminders
   )
-    ? dashboardData.upcomingReminders.map((reminder: any) => ({
+    ? dashboardData.upcomingReminders.map((reminder) => ({
         ...reminder,
         // Convert datetime to Date object
         datetime: new Date(reminder.datetime),

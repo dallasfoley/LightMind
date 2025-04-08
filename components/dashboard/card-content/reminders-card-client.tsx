@@ -12,9 +12,6 @@ export default function RemindersCardClient({
   reminders: ReminderType[];
 }) {
   const [todaysReminders, setTodaysReminders] = useState<ReminderType[]>([]);
-  const [upcomingReminders, setUpcomingReminders] = useState<ReminderType[]>(
-    []
-  );
 
   useEffect(() => {
     // Get today's date in the client's timezone
@@ -24,7 +21,6 @@ export default function RemindersCardClient({
     const todayDay = today.getDate();
 
     // Create start and end of today in client's timezone
-    const todayStart = new Date(todayYear, todayMonth, todayDay, 0, 0, 0);
     const todayEnd = new Date(todayYear, todayMonth, todayDay, 23, 59, 59, 999);
 
     // Filter reminders on the client side to ensure correct timezone
@@ -75,7 +71,6 @@ export default function RemindersCardClient({
     });
 
     setTodaysReminders(sortedTodayReminders);
-    setUpcomingReminders(sortedUpcomingReminders);
 
     console.log("Client-side today's reminders:", sortedTodayReminders.length);
     console.log(

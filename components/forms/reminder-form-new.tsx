@@ -33,7 +33,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import TimezoneDebug from "@/components/timezone-debug";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { createReminderWithDateString } from "@/server/actions/reminders/createReminderWithDateString";
@@ -188,7 +187,6 @@ export default function ReminderFormNew({ userId }: ReminderFormProps) {
         <CardTitle className="text-xl text-center">New Reminder</CardTitle>
       </CardHeader>
       <CardContent>
-        <TimezoneDebug />
         <div className="my-4" />
 
         {error && (
