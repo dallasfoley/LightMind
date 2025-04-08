@@ -6,7 +6,6 @@ import { getDashboardData } from "@/server/actions/getDashboardData";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatbotLink } from "@/components/dashboard/chatbot-link";
-import { utcToLocal, isToday } from "@/lib/date-utils";
 
 export const metadata = {
   title: "Dashboard | LightMind",
@@ -28,34 +27,40 @@ export default async function DashboardPage() {
   const transformedCheckIns =
     dashboardData?.recentCheckIns?.map((checkIn) => ({
       ...checkIn,
-      // Ensure date is a proper Date object in local timezone
+      // Ensure date is a proper Date object
       date:
         checkIn.date instanceof Date ? checkIn.date : new Date(checkIn.date),
     })) || [];
 
-  // Filter today's reminders again on the client side to be sure
-  const todaysReminders =
-    dashboardData?.todaysReminders?.filter((reminder) =>
-      isToday(reminder.datetime)
-    ) || [];
+  // Transform today's reminders - ensure we're handling the correct type
+  const transformedTodayReminders = Array.isArray(
+    dashboardData?.todaysReminders
+  )
+    ? dashboardData.todaysReminders.map((reminder: any) => ({
+        ...reminder,
+        // Convert datetime to Date object
+        datetime: new Date(reminder.datetime),
+        // Ensure completed is a boolean (not null)
+        completed: reminder.completed === null ? false : reminder.completed,
+        // Convert notificationTime to undefined if null
+        notificationTime: reminder.notificationTime ?? undefined,
+      }))
+    : [];
 
-  const transformedTodayReminders =
-    todaysReminders.map((reminder) => ({
-      ...reminder,
-      // Convert datetime to local timezone
-      datetime: utcToLocal(reminder.datetime),
-      completed: reminder.completed ?? false,
-      notificationTime: reminder.notificationTime ?? undefined,
-    })) || [];
-
-  const transformedUpcomingReminders =
-    dashboardData?.upcomingReminders?.map((reminder) => ({
-      ...reminder,
-      // Convert datetime to local timezone
-      datetime: utcToLocal(reminder.datetime),
-      completed: reminder.completed ?? false,
-      notificationTime: reminder.notificationTime ?? undefined,
-    })) || [];
+  // Transform upcoming reminders - ensure we're handling the correct type
+  const transformedUpcomingReminders = Array.isArray(
+    dashboardData?.upcomingReminders
+  )
+    ? dashboardData.upcomingReminders.map((reminder: any) => ({
+        ...reminder,
+        // Convert datetime to Date object
+        datetime: new Date(reminder.datetime),
+        // Ensure completed is a boolean (not null)
+        completed: reminder.completed === null ? false : reminder.completed,
+        // Convert notificationTime to undefined if null
+        notificationTime: reminder.notificationTime ?? undefined,
+      }))
+    : [];
 
   const transformedDashboardData = dashboardData
     ? {
