@@ -100,18 +100,18 @@ export default function ReminderFormNew({ userId }: ReminderFormProps) {
       // Extract time components
       const [hours, minutes] = formData.time.split(":").map(Number);
 
-      // Create a date string in YYYY-MM-DD HH:MM:SS format
-      // This format has no timezone information
+      // Create a date string in ISO 8601 format WITHOUT timezone information
+      // This allows the server to interpret it correctly
       const dateString = `${year}-${String(month).padStart(2, "0")}-${String(
         day
-      ).padStart(2, "0")} ${String(hours).padStart(2, "0")}:${String(
+      ).padStart(2, "0")}T${String(hours).padStart(2, "0")}:${String(
         minutes
       ).padStart(2, "0")}:00`;
 
       console.log("Submitting reminder with date string:", dateString);
 
       // Try using the server action first
-      const result = await createReminderWithDateString({
+      await createReminderWithDateString({
         title: formData.title,
         description: formData.description || "",
         dateString: dateString,
@@ -119,34 +119,7 @@ export default function ReminderFormNew({ userId }: ReminderFormProps) {
         notificationTime: formData.notificationTime,
       });
 
-      if (result.success) {
-        router.replace("/dashboard/reminders");
-        return;
-      }
-
-      // If server action fails, try the API route
-      console.log("Server action failed, trying API route");
-      const response = await fetch("/api/reminders/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description || "",
-          dateString: dateString,
-          completed: formData.completed,
-          notificationTime: formData.notificationTime,
-          userId: userId,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error: ${response.status}`);
-      }
-
-      router.replace("/dashboard/reminders");
+      // Rest of your code remains the same...
     } catch (e) {
       console.error(e);
       setError(

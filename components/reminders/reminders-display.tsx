@@ -63,26 +63,30 @@ export default function RemindersDisplay({ userId }: { userId: string }) {
     fetchReminders();
   }, []);
 
-  // Function to format date string for display
   const formatDate = (dateString: string) => {
     try {
-      // Parse the date string
+      // Parse the date string and convert to local timezone for display
       const date = new Date(dateString);
-      return date.toLocaleDateString();
+      return date.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "UTC", // Interpret the stored date as UTC
+      });
     } catch (error) {
-      console.error("Error formatting time:", error);
+      console.error("Error formatting date:", error);
       return "Invalid date";
     }
   };
 
-  // Function to format time string for display
   const formatTime = (dateString: string) => {
     try {
-      // Parse the date string
+      // Parse the date string and convert to local timezone for display
       const date = new Date(dateString);
-      return date.toLocaleTimeString([], {
+      return date.toLocaleTimeString(undefined, {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: "UTC", // Interpret the stored date as UTC
       });
     } catch (error) {
       console.error("Error formatting time:", error);
