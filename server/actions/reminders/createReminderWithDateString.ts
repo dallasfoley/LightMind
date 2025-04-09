@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { RemindersTable } from "@/drizzle/schema";
 import { getUser } from "@/server/actions/users/getUser";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 const CreateReminderSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -29,10 +31,11 @@ export async function createReminderWithDateString(
 
     console.log("Creating reminder with date string:", data.dateString);
 
-    // Parse the date string to create a JavaScript Date object
-    const datetime = new Date(data.dateString);
+    // Create a Date object from the provided string
+    // Note: This will parse the date in the UTC timezone
+    const datetime = new Date(data.dateString + "Z");
 
-    console.log("Parsed date:", datetime.toISOString());
+    console.log("Parsed date in UTC:", datetime.toISOString());
 
     // Insert the reminder
     await db.insert(RemindersTable).values({
@@ -48,5 +51,8 @@ export async function createReminderWithDateString(
   } catch (e) {
     console.error(e);
     return { success: false, error: "Database error" };
+  } finally {
+    revalidatePath("/dashboard/reminders");
+    redirect("/dashboard/reminders");
   }
 }
