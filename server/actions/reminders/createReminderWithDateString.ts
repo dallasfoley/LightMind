@@ -2,7 +2,6 @@
 
 import { db } from "@/lib/db";
 import { RemindersTable } from "@/drizzle/schema";
-import { getUser } from "@/server/actions/users/getUser";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -13,14 +12,14 @@ const CreateReminderSchema = z.object({
   dateString: z.string(),
   completed: z.boolean().default(false),
   notificationTime: z.number().min(0).optional(),
+  userId: z.string(),
 });
 
 export async function createReminderWithDateString(
   formData: z.infer<typeof CreateReminderSchema>
 ) {
   try {
-    const user = await getUser();
-    if (!user) {
+    if (!formData.userId) {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -44,7 +43,7 @@ export async function createReminderWithDateString(
       datetime,
       completed: data.completed,
       notificationTime: data.notificationTime || null,
-      userId: user.id,
+      userId: data.userId,
     });
 
     return { success: true };

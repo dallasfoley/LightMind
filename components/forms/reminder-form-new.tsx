@@ -54,7 +54,6 @@ interface ReminderFormProps {
 }
 
 export default function ReminderFormNew({ userId }: ReminderFormProps) {
-  const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -117,6 +116,7 @@ export default function ReminderFormNew({ userId }: ReminderFormProps) {
         dateString: dateString,
         completed: formData.completed,
         notificationTime: formData.notificationTime,
+        userId: userId,
       });
 
       // Rest of your code remains the same...
