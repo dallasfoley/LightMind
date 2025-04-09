@@ -38,11 +38,9 @@ export default async function DashboardPage() {
   )
     ? dashboardData.todaysReminders.map((reminder) => ({
         ...reminder,
-        // Convert datetime to Date object
+        // Ensure datetime is properly interpreted as a Date object
         datetime: new Date(reminder.datetime),
-        // Ensure completed is a boolean (not null)
         completed: reminder.completed === null ? false : reminder.completed,
-        // Convert notificationTime to undefined if null
         notificationTime: reminder.notificationTime ?? undefined,
       }))
     : [];
