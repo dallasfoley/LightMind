@@ -143,15 +143,19 @@ export async function getDashboardData(
       }))
     );
 
-    // Process reminders to separate today's from upcoming
-    // For production with different server timezone, we'll send ALL reminders to the client
-    // and let the client filter them based on the user's local timezone
-    const allReminders = remindersResult.map((reminder) => ({
-      ...reminder,
-      datetime: new Date(reminder.datetime),
-      completed: reminder.completed === null ? false : reminder.completed,
-      notificationTime: reminder.notificationTime ?? undefined,
-    }));
+    // Process reminders - convert all datetime strings to Date objects
+    // to match the ReminderType expected in the interface
+    const allReminders = remindersResult.map((reminder) => {
+      // Parse the datetime string to preserve timezone information
+      const reminderDate = new Date(reminder.datetime);
+
+      return {
+        ...reminder,
+        datetime: reminderDate,
+        completed: reminder.completed === null ? false : reminder.completed,
+        notificationTime: reminder.notificationTime ?? undefined,
+      };
+    });
 
     // Process check-ins to add proper Date objects
     const processedCheckIns = recentCheckInsResult.map((checkIn) => {
@@ -198,7 +202,7 @@ export async function getDashboardData(
       todaysCheckIn: todaysCheckInResult[0] || null,
       recentCheckIns: processedCheckIns,
       todaysJournal: todaysJournalResult[0] || null,
-      todaysReminders: allReminders, // Send all reminders to client
+      todaysReminders: allReminders, // Send all reminders as Date objects
       upcomingReminders: [], // Let client filter these
       checkedInToday: todaysCheckInResult.length > 0,
       journalStreak: hasJournaledRecently ? journalStreak : 0,
