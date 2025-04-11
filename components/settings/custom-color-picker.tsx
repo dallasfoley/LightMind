@@ -1,6 +1,6 @@
 "use client";
 
-import { useCustomTheme } from "@/components/theme-provider";
+import { useCustomTheme } from "@/contexts/theme-provider";
 import { HexColorPicker } from "react-colorful";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";

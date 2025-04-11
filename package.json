@@ -37,6 +37,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
+    "cookies-next": "^5.1.0",
     "critters": "^0.0.25",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.39.1",

@@ -9,14 +9,9 @@ import {
 } from "@/drizzle/schema";
 import { eq, and, gte, asc } from "drizzle-orm";
 import type { UserType } from "@/schema/userSchema";
-import {
-  getTodayString,
-  getYesterdayString,
-  daysAgoString,
-  startOfToday,
-  endOfToday,
-} from "@/lib/date-utils";
 import type { ReminderType } from "@/schema/reminderSchema";
+import { cookies } from "next/headers";
+import { format, subDays } from "date-fns";
 
 // Define the return type for the dashboard data
 interface DashboardData {
@@ -48,11 +43,22 @@ export async function getDashboardData(
 
   try {
     // Use the user's local timezone for date calculations
-    const todayStart = startOfToday();
-    const todayEnd = endOfToday();
-    const todayString = getTodayString();
-    const yesterdayString = getYesterdayString();
-    const sevenDaysAgoString = daysAgoString(7);
+    const cookieStore = await cookies();
+    const timezoneOffset = parseInt(
+      cookieStore.get("userTimezoneOffset")?.value || "0"
+    );
+
+    // Use the timezone offset to adjust the date
+    const now = new Date();
+    const userDate = new Date(now.getTime() - timezoneOffset * 60 * 1000);
+    const today = format(userDate, "yyyy-MM-dd");
+    const todayString = format(userDate, "yyyy-MM-dd");
+    const yesterdayString = format(subDays(userDate, 1), "yyyy-MM-dd");
+    const sevenDaysAgoString = format(subDays(userDate, 7), "yyyy-MM-dd");
+
+    // Create adjusted date objects for time-based queries
+    const todayStart = new Date(todayString + "T00:00:00");
+    const todayEnd = new Date(todayString + "T23:59:59");
 
     console.log("Date debug:", {
       todayString,

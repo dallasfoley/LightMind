@@ -9,7 +9,7 @@ import { CheckInTable } from "@/drizzle/schema";
 import { revalidatePath } from "next/cache";
 
 export async function submitCheckIn(
-  formData: CheckInFormDataType,
+  formData: CheckInFormDataType & { timezoneOffset: number }, // add timezone offset to the type
   userId: string
 ) {
   try {
@@ -22,11 +22,15 @@ export async function submitCheckIn(
       return { success: false, error: "Unauthorized" };
     }
 
-    // Fix: Use local date methods instead of UTC to prevent date shifting
+    // Adjust date based on timezone offset
     const dateObj = new Date(data.date);
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObj.getDate()).padStart(2, "0");
+    const adjustedDate = new Date(
+      dateObj.getTime() - formData.timezoneOffset * 60 * 1000
+    );
+
+    const year = adjustedDate.getFullYear();
+    const month = String(adjustedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(adjustedDate.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
 
     console.log(
@@ -39,7 +43,8 @@ export async function submitCheckIn(
     await db
       .insert(CheckInTable)
       .values({ ...data, date: formattedDate, userId });
-    revalidatePath("/dashboard");
+    revalidatePath("/dashboard", "page");
+    revalidatePath("/dashboard", "layout");
 
     return { success: true };
   } catch (dbError) {

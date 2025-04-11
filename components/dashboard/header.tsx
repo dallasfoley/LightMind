@@ -13,7 +13,7 @@ import { SignOutButton } from "@clerk/nextjs";
 import { Bell, Menu, Settings, User } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { useSidebar } from "./sidebar-provider";
+import { useSidebar } from "@/contexts/sidebar-provider";
 
 export default function Header() {
   const { user, isSignedIn } = useUser();

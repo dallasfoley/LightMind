@@ -12,28 +12,16 @@ import { FaBell } from "react-icons/fa";
 import { BiCustomize } from "react-icons/bi";
 import { IoIosHome } from "react-icons/io";
 import { FaFolder } from "react-icons/fa";
-import { useEffect, useState } from "react";
-import type { UserType } from "@/schema/userSchema";
-import { getTodaysCheckIn } from "@/server/actions/checkIns/getTodaysCheckIn";
-import type { CheckInDataType } from "@/schema/checkInSchema";
+import { useEffect } from "react";
 import { TbMessageChatbot } from "react-icons/tb";
 import { X } from "lucide-react";
-import { useSidebar } from "./sidebar-provider";
+import { useSidebar } from "../../contexts/sidebar-provider";
+import { useCheckIn } from "@/contexts/check-in-provider";
 
-export default function Sidebar({ user }: { user: UserType }) {
+export default function Sidebar() {
   const pathname = usePathname();
-  const [checkIn, setCheckIn] = useState<CheckInDataType>();
+  const { checkIn } = useCheckIn();
   const { isSidebarOpen, closeSidebar } = useSidebar();
-
-  useEffect(() => {
-    const fetchCheckIn = async () => {
-      const todayCheckIn = await getTodaysCheckIn(user.id);
-      if (todayCheckIn) {
-        setCheckIn({ ...todayCheckIn, date: new Date(todayCheckIn.date) });
-      }
-    };
-    fetchCheckIn();
-  }, [user.id]);
 
   // Close sidebar on window resize
   useEffect(() => {
