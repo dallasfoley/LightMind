@@ -13,7 +13,6 @@ import { BiCustomize } from "react-icons/bi";
 import { IoIosHome } from "react-icons/io";
 import { FaFolder } from "react-icons/fa";
 import { useEffect } from "react";
-import type { UserType } from "@/schema/userSchema";
 import { TbMessageChatbot } from "react-icons/tb";
 import { X } from "lucide-react";
 import { useSidebar } from "../../contexts/sidebar-provider";
