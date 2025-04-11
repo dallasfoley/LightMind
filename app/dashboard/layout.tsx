@@ -36,7 +36,7 @@ export default async function DashboardLayout({
           {user && (
             <CheckInProvider userId={user?.id}>
               <div className="flex h-screen overflow-hidden">
-                {user && <DynamicSidebar user={user} />}
+                {user && <DynamicSidebar />}
                 <div className="flex flex-col flex-1 overflow-hidden bg-zinc-100 dark:bg-zinc-900 custom-bg">
                   <DynamicHeader />
                   <main className="flex-1 overflow-x-hidden overflow-y-auto">

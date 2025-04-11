@@ -12,17 +12,14 @@ import { FaBell } from "react-icons/fa";
 import { BiCustomize } from "react-icons/bi";
 import { IoIosHome } from "react-icons/io";
 import { FaFolder } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { UserType } from "@/schema/userSchema";
-import { getTodaysCheckIn } from "@/server/actions/checkIns/getTodaysCheckIn";
-import type { CheckInDataType } from "@/schema/checkInSchema";
 import { TbMessageChatbot } from "react-icons/tb";
 import { X } from "lucide-react";
 import { useSidebar } from "../../contexts/sidebar-provider";
-import { setCookie } from "cookies-next";
 import { useCheckIn } from "@/contexts/check-in-provider";
 
-export default function Sidebar({ user }: { user: UserType }) {
+export default function Sidebar() {
   const pathname = usePathname();
   const { checkIn } = useCheckIn();
   const { isSidebarOpen, closeSidebar } = useSidebar();
