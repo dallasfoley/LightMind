@@ -6,6 +6,7 @@ import { getDashboardData } from "@/server/actions/getDashboardData";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatbotLink } from "@/components/dashboard/chatbot-link";
+import TimezoneDetector from "@/components/timezone-detector";
 
 export const metadata = {
   title: "Dashboard | LightMind",
@@ -84,6 +85,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-4">
+      <TimezoneDetector />
       {user && (
         <NavLinks user={user} dashboardData={transformedDashboardData} />
       )}

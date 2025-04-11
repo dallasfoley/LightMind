@@ -43,6 +43,7 @@ import { updateCheckIn } from "@/server/actions/checkIns/updateCheckIn";
 import { getTodaysCheckIn } from "@/server/actions/checkIns/getTodaysCheckIn";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "@/lib/utils";
+import { useCheckIn } from "@/contexts/check-in-provider";
 
 // Custom ColoredSlider component
 const ColoredSlider = React.forwardRef<
@@ -77,6 +78,7 @@ export function DailyCheckInForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [defaultFormValues, setDefaultFormValues] =
     useState<CheckInFormDataType | null>(null);
+  const { refreshCheckIn } = useCheckIn();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -141,12 +143,14 @@ export function DailyCheckInForm({
     setIsSubmitting(true);
 
     try {
+      const timezoneOffset = new Date().getTimezoneOffset();
       const submissionData = {
         ...formData,
         date:
           formData.date instanceof Date
             ? formData.date
             : new Date(formData.date),
+        timezoneOffset,
       };
 
       const result = update
@@ -154,12 +158,12 @@ export function DailyCheckInForm({
         : await submitCheckIn(submissionData, userId);
 
       if (result.success) {
+        await refreshCheckIn();
         toast({
           title: "Check-in submitted",
           description: "Your daily check-in has been recorded.",
         });
         router.replace("/dashboard");
-        form.reset();
       } else {
         toast({
           title: "Error",

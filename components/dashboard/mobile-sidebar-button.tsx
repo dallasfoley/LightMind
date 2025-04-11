@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { useSidebar } from "./sidebar-provider";
+import { useSidebar } from "../../contexts/sidebar-provider";
 
 export default function MobileSidebarButton() {
   const { openSidebar } = useSidebar();
