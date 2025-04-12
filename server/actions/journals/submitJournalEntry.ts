@@ -11,7 +11,7 @@ import { and, eq } from "drizzle-orm";
 import { UserType } from "@/schema/userSchema";
 
 export async function submitJournalEntry(
-  formData: JournalEntryFormType,
+  formData: JournalEntryFormType & { timezoneOffset: number },
   user: UserType
 ) {
   try {
@@ -26,7 +26,15 @@ export async function submitJournalEntry(
     }
 
     const userId = user.id;
-    const formattedDate = format(data.date, "yyyy-MM-dd");
+    const dateObj = new Date(data.date);
+    const adjustedDate = new Date(
+      dateObj.getTime() - formData.timezoneOffset * 60 * 1000
+    );
+
+    const year = adjustedDate.getFullYear();
+    const month = String(adjustedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(adjustedDate.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
     await db.insert(JournalTable).values({
       title: data.title,
       content: data.content,

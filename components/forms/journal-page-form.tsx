@@ -65,7 +65,17 @@ export function JournalPageForm({ user }: { user: UserType }) {
 
   const onSubmit = async (formData: JournalEntryFormType) => {
     try {
-      const res = await submitJournalEntry(formData, user);
+      const timezoneOffset = new Date().getTimezoneOffset();
+      const submissionData = {
+        ...formData,
+        date:
+          formData.date instanceof Date
+            ? formData.date
+            : new Date(formData.date),
+        timezoneOffset,
+      };
+
+      const res = await submitJournalEntry(submissionData, user);
       if (res.success === true) {
         setShowAlert(true);
         setTimeout(() => {
