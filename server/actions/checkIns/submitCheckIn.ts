@@ -9,7 +9,7 @@ import { CheckInTable } from "@/drizzle/schema";
 import { revalidatePath } from "next/cache";
 
 export async function submitCheckIn(
-  formData: CheckInFormDataType & { timezoneOffset: number }, // add timezone offset to the type
+  formData: CheckInFormDataType & { timezoneOffset: number },
   userId: string
 ) {
   try {
